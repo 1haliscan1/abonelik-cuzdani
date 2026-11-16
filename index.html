@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5B4FE8">
+<meta name="description" content="Aboneliklerini tek yerde takip et, zamdan ve çekimden önce haberin olsun, uygun kart kampanyasını gör.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Abonelik Cüzdanı">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}*,*::before,*::after{box-sizing:inherit}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+#installBar{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--accent-soft);color:var(--fg);padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));font-size:14px}
+#installBar b{font-family:var(--display)}
+#installBar .acts{display:flex;gap:8px;flex:none}
+#installBar button{border:0;border-radius:10px;padding:8px 12px;font-weight:700;font-size:13px}
+#installBar .go{background:var(--accent);color:var(--accent-fg)}
+#installBar .no{background:transparent;color:var(--muted)}</style>
+<title>Abonelik Cüzdanı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: app shell; left rail on desktop, bottom tab bar on phones (as in the mockups). Indigo accent from the mockups. */
+:root{
+  --bg:#F4F4FB; --surface:#FFFFFF; --surface-2:#EEEDFC; --fg:#17163A; --muted:#6B6A8C; --line:#E3E2F2;
+  --accent:#5B4FE8; --accent-fg:#FFFFFF; --accent-soft:#E9E7FF;
+  --hero-a:#2B2770; --hero-b:#4B3FD6;
+  --good:#1E9E62; --good-soft:#E3F6EC; --warn:#B86E00; --warn-soft:#FFF2DC; --bad:#D63B3B; --bad-soft:#FDE8E8;
+  --c1:#5B4FE8; --c2:#1FA39A; --c3:#E0802A; --c4:#C2459C; --c5:#3B82C4; --c6:#8E8BA8;
+  --display:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --body:"Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F0E22; --surface:#191833; --surface-2:#23214A; --fg:#ECEBFF; --muted:#A3A1C7; --line:#2C2A52;
+  --accent:#8A80FF; --accent-fg:#0F0E22; --accent-soft:#2A2760;
+  --hero-a:#1E1B4F; --hero-b:#3A30B0;
+  --good:#46C98B; --good-soft:#163A2B; --warn:#F0B04A; --warn-soft:#3A2D14; --bad:#FF7272; --bad-soft:#3F1C22;
+  --c1:#8A80FF; --c2:#3CC7BC; --c3:#F29C4C; --c4:#E06BBD; --c5:#62A6E6; --c6:#7E7BA0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F0E22; --surface:#191833; --surface-2:#23214A; --fg:#ECEBFF; --muted:#A3A1C7; --line:#2C2A52;
+  --accent:#8A80FF; --accent-fg:#0F0E22; --accent-soft:#2A2760;
+  --hero-a:#1E1B4F; --hero-b:#3A30B0;
+  --good:#46C98B; --good-soft:#163A2B; --warn:#F0B04A; --warn-soft:#3A2D14; --bad:#FF7272; --bad-soft:#3F1C22;
+  --c1:#8A80FF; --c2:#3CC7BC; --c3:#F29C4C; --c4:#E06BBD; --c5:#62A6E6; --c6:#7E7BA0;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.shell{display:grid;grid-template-columns:220px minmax(0,1fr);max-width:1180px;margin:0 auto;min-height:100vh}
+.rail{position:sticky;top:0;align-self:start;height:100vh;padding:28px 16px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em;padding:0 10px 18px;display:flex;align-items:center;gap:10px}
+.brand i{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:var(--accent-fg);font-style:normal;font-size:15px}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:0;background:none;color:var(--muted);font-weight:600;text-align:left}
+.nav-btn svg{width:20px;height:20px;flex:none}
+.nav-btn[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.nav-btn:hover{color:var(--fg)}
+.add-btn{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:0;background:var(--accent);color:var(--accent-fg);font-weight:700}
+main{padding-block:28px 110px;padding-inline:clamp(16px,4vw,40px);min-width:0}
+.view{display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--display);font-size:26px;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-size:17px;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.sample{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:600}
+.sample button{border:1px solid currentColor;background:none;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;color:inherit}
+.hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));color:#fff;border-radius:22px;padding:24px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end}
+.hero small{opacity:.8;font-weight:600}
+.hero .big{font-family:var(--display);font-weight:800;font-size:clamp(36px,6vw,48px);letter-spacing:-.03em;line-height:1.05}
+.hero .big span{font-size:.5em;opacity:.85}
+.hero .meta{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;opacity:.92}
+.hero .meta b{font-size:15px}
+.hero .gain{background:rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;max-width:240px}
+.hero .gain b{display:block;font-size:22px;font-family:var(--display)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{display:flex;flex-direction:column;gap:6px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:14px}
+.tile .ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center}
+.tile .lbl{color:var(--muted);font-size:13px}
+.tile .val{font-weight:700}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;align-items:start}
+.list{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 4px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;width:100%}
+.item:last-child{border-bottom:0}
+.item:hover .nm{color:var(--accent)}
+/* Servis rozetleri: marka logosu değil, kendi harf rozetimiz. Renkler rozetin içinde kapalıdır (zemin + yazı birlikte), iki temada da okunur. */
+.logo{--b:#5B5BD6;--t:#fff;width:44px;height:44px;flex:none;border-radius:13px;display:grid;place-items:center;color:var(--t);font-weight:800;font-family:var(--display);font-size:18px;letter-spacing:-.03em;line-height:1;
+  background:radial-gradient(120% 120% at 18% 12%,color-mix(in srgb,var(--b) 72%,#fff) 0%,var(--b) 58%,color-mix(in srgb,var(--b) 80%,#000) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 -6px 10px -6px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.12)}
+.logo.duo{font-size:15px}
+.logo.sm{width:22px;height:22px;border-radius:7px;font-size:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.logo.sm.duo{font-size:8.5px}
+.chips button{display:inline-flex;align-items:center;gap:7px}
+.nm{font-weight:700;overflow-wrap:anywhere}
+.mt{color:var(--muted);font-size:13px}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.p-good{background:var(--good-soft);color:var(--good)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.p-acc{background:var(--accent-soft);color:var(--accent)}
+.link{border:0;background:none;color:var(--accent);font-weight:700;font-size:13px;padding:0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap}
+.search{flex:1 1 220px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.search input{border:0;background:none;padding:11px 0;width:100%;outline:none}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:none;border-radius:9px;padding:7px 12px;font-weight:600;color:var(--muted);font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.offer{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.rate{min-width:72px;height:64px;padding:0 6px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px;text-align:center;line-height:1}
+.rate small{display:block;font-size:10px;font-weight:700;letter-spacing:.04em}
+.offer h3{margin:0 0 2px;font-size:15px}
+.offer .terms{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.offer .match{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--good-soft);color:var(--good);font-size:13px;font-weight:600}
+.offer .how{margin-top:8px;font-size:12.5px;color:var(--muted)}
+.offer .how code{font-family:var(--mono);background:var(--surface-2);padding:1px 6px;border-radius:6px;color:var(--fg)}
+.note{display:flex;gap:10px;align-items:flex-start;background:var(--accent-soft);color:var(--fg);border-radius:12px;padding:12px 14px;font-size:13px}
+.donut-wrap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:center}
+.legend{display:flex;flex-direction:column;gap:10px}
+.lg{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:14px}
+.lg i{width:12px;height:12px;border-radius:4px}
+.lg .pc{color:var(--muted);font-size:13px;min-width:38px;text-align:right}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:99px}
+.empty{text-align:center;padding:30px 10px;color:var(--muted)}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,8,40,.45);display:grid;place-items:center;padding:16px;z-index:50}
+.sheet{background:var(--surface);border-radius:20px;width:min(480px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:22px;display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+.field input,.field select{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chk{display:flex;gap:10px;align-items:center;font-weight:600;font-size:14px}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700}
+.btn-p{background:var(--accent);color:var(--accent-fg)}
+.btn-g{background:var(--surface-2);color:var(--fg)}
+.btn-d{background:var(--bad-soft);color:var(--bad)}
+.err{color:var(--bad);font-size:13px;font-weight:600}
+.todo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.todo:last-child{border-bottom:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-weight:600;font-size:13px;color:var(--fg)}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.field textarea{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;width:100%;min-height:150px;font:12px/1.4 var(--mono,monospace);color:var(--fg);resize:vertical}
+.yr{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
+.yr .tile .val{font-size:20px;font-family:var(--display)}
+.steps{margin:6px 0;padding-left:20px;font-size:13.5px;display:flex;flex-direction:column;gap:2px}
+.tabbar{display:none}
+@media (max-width:760px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  main{padding-top:20px}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button[aria-current="page"]{color:var(--accent)}
+  .tabbar .fab{align-self:center;justify-self:center;width:48px;height:48px;border-radius:50%;background:var(--accent);color:var(--accent-fg);justify-content:center;margin-top:-18px;box-shadow:0 6px 18px rgba(91,79,232,.35)}
+  .hero{grid-template-columns:1fr}
+  .donut-wrap{grid-template-columns:1fr;justify-items:center}
+  .legend{width:100%}
+}
+@media (prefers-reduced-motion:no-preference){.view{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+</head>
+<body>
+<div id="installBar" hidden><span id="installText"></span><span class="acts"><button class="go" id="installGo" type="button" hidden>Kur</button><button class="no" id="installNo" type="button">Kapat</button></span></div>
+<div class="shell">
+  <aside class="rail" aria-label="Menü">
+    <div class="brand"><i>₺</i>Abonelik Cüzdanı</div>
+    <div id="railNav"></div>
+    <button class="add-btn" id="railAdd" type="button">+ Abonelik ekle</button>
+  </aside>
+  <main id="main"></main>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Menü"></nav>
+<div id="sheetRoot"></div>
+
+<script>
+(function(){
+const ICONS={
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>',
+  tag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17v.5"/></svg>',
+  search:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
+};
+const VIEWS=[["home","Ana Sayfa"],["subs","Abonelikler"],["offers","Kampanyalar"],["stats","Analiz"]];
+const CATS=["Eğlence","Müzik","Verimlilik","Oyun","Bulut","Diğer"];
+const CAT_COLOR={"Eğlence":"--c1","Müzik":"--c2","Verimlilik":"--c3","Oyun":"--c4","Bulut":"--c5","Diğer":"--c6"};
+const CARDS=["Bilmiyorum / diğer","Bonus","Maximum","World","Axess","Paraf","Bankkart","CardFinans","Papara","Papel","Enpara","ON","Tosla"];
+// Kampanya akışı campaigns.json dosyasından gelir; bot bu dosyayı günceller.
+let FEED={updatedAt:null,sources:[],campaigns:[]},feedState="loading";
+const KEY="abonelik-cuzdani-v2";
+const today=new Date(); today.setHours(0,0,0,0);
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const plus=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return iso(d)};
+function sample(){return [
+  {id:"s1",name:"Netflix",price:289.99,cycle:"m",next:plus(8),cat:"Eğlence",card:"Bonus",trial:false},
+  {id:"s2",name:"Spotify",price:99,cycle:"m",next:plus(12),cat:"Müzik",card:"Maximum",trial:false},
+  {id:"s3",name:"YouTube Premium",price:79,cycle:"m",next:plus(15),cat:"Eğlence",card:"World",trial:false},
+  {id:"s4",name:"Adobe Creative Cloud",price:850,cycle:"m",next:plus(2),cat:"Verimlilik",card:"Axess",trial:true},
+  {id:"s5",name:"Disney+",price:249.9,cycle:"m",next:plus(27),cat:"Eğlence",card:"Bilmiyorum / diğer",trial:false},
+  {id:"s6",name:"ChatGPT Plus",price:199,cycle:"m",next:plus(12),cat:"Verimlilik",card:"Maximum",trial:false},
+  {id:"s8",name:"iCloud+ 50 GB",price:40,cycle:"m",next:plus(19),cat:"Bulut",card:"Bonus",trial:false},
+  {id:"s7",name:"Xbox Game Pass",price:1980,cycle:"y",next:plus(95),cat:"Oyun",card:"Bonus",trial:false}
+]}
+let state={subs:sample(),isSample:true,view:"home",q:"",filter:"Tümü",statMode:"cat",myCards:["Bonus","Maximum"],young:true,joined:{},saved:{}};
+try{const raw=localStorage.getItem(KEY);if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved}))}catch(e){}}
+try{const h=location.hash.slice(1);if(VIEWS.some(v=>v[0]===h))state.view=h}catch(e){}
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const tl=n=>new Intl.NumberFormat("tr-TR",{maximumFractionDigits:n%1?2:0}).format(n);
+const trDate=s=>new Date(s+"T00:00:00").toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"});
+function nextDate(s){ // ödeme tarihi geçtiyse döngüye göre ileri sar
+  let d=new Date(s.next+"T00:00:00"); if(isNaN(d))return today;
+  let guard=0; while(d<today&&guard++<400){ if(s.cycle==="y")d.setFullYear(d.getFullYear()+1); else d.setMonth(d.getMonth()+1); }
+  return d;
+}
+const daysLeft=s=>Math.round((nextDate(s)-today)/864e5);
+const monthly=s=>s.cycle==="y"?s.price/12:s.price;
+function pill(n){const c=n<=3?"p-bad":n<=7?"p-warn":"p-good";return '<span class="pill '+c+' num">'+(n===0?"Bugün":n+" gün kaldı")+'</span>'}
+// Rozet tablosu: [anahtar kelime, kısaltma, zemin, yazı]. Bilinmeyen servisler adından türetilen renkle baş harf alır.
+const BADGES=[["netflix","N","#C2182B"],["spotify","Sp","#15803D"],["youtube","YT","#D12C20"],["disney","D+","#1E3A9E"],["hbo","HB","#5B2BD6"],["prime","Pr","#0B76B0"],["amazon","Pr","#0B76B0"],["exxen","Ex","#F2B705","#231A00"],["gain","Ga","#D6336C"],["tabii","Tb","#0E8A84"],["tabıı","Tb","#0E8A84"],["mubi","Mu","#2B3046"],["mubı","Mu","#2B3046"],["chatgpt","AI","#0F766E"],["gemini","Ge","#3B5BDB"],["icloud","iC","#2F80ED"],["google one","G1","#3867D6"],["apple music","AM","#E03150"],["apple tv","TV","#2B3046"],["game pass","GP","#1F7A1F"],["xbox","Xb","#1F7A1F"],["playstation","PS","#1D4ED8"],["steam","St","#27405E"],["canva","Cv","#0AA1B3"],["adobe","Ad","#C92A1E"],["blutv","Bl","#1273C4"],["tod","TD","#5B2A86"],["s sport","SS","#B4161B"],["duolingo","Du","#4C9A0B"],["notion","No","#2B3046"],["microsoft","Ms","#0F6CBD"],["office","Of","#C2410C"],["dropbox","Db","#1557D6"],["turkcell","Tc","#F2B705","#231A00"],["vodafone","Vf","#C81919"],["türk telekom","TT","#0A5FA8"],["superonline","So","#0A5FA8"],["digiturk","Dg","#6D28D9"],["trendyol","Ty","#E8590C"],["hepsiburada","Hb","#E8590C"],["pazarama","Pz","#7C3AED"],["macfit","MF","#C2182B"]];
+const HUES=["#5B5BD6","#0E8A84","#C2410C","#B4338A","#1D6FD6","#4C7A0B","#7C3AED","#B45309"];
+function badgeOf(name){
+  const n=String(name||"").trim(),l=n.toLocaleLowerCase("tr-TR");
+  const b=BADGES.find(x=>l.includes(x[0]));
+  if(b)return {m:b[1],c:b[2],t:b[3]||"#fff"};
+  let h=0;for(const ch of l)h=(h*31+ch.codePointAt(0))>>>0;
+  const w=n.split(/\s+/).filter(Boolean);
+  const m=((w[0]||"?")[0]+(w[1]&&/[\p{L}\d]/u.test(w[1][0])?w[1][0]:"")).toLocaleUpperCase("tr-TR");
+  return {m,c:HUES[h%HUES.length],t:"#fff"};
+}
+function badge(name,sm){const b=badgeOf(name);return '<span class="logo'+(b.m.length>1?' duo':'')+(sm?' sm':'')+'" style="--b:'+b.c+';--t:'+b.t+'" aria-hidden="true">'+esc(b.m)+'</span>'}
+function logo(s){return badge(s.name)}
+const activeCampaigns=()=>FEED.campaigns.filter(c=>!c.end||new Date(c.end+"T00:00:00")>=today);
+const cDays=c=>c.end?Math.round((new Date(c.end+"T00:00:00")-today)/864e5):null;
+// Abonelik adı kampanyanın anahtar kelimelerinden birini içeriyorsa eşleşir
+function matchesFor(s){
+  const n=s.name.toLocaleLowerCase("tr-TR");
+  return activeCampaigns().filter(c=>(c.keywords||[]).some(k=>n.includes(k))).map(c=>({c,strong:true}));
+}
+function subsFor(c){return state.subs.filter(s=>matchesFor(s).some(m=>m.c.id===c.id))}
+const matchedCount=()=>activeCampaigns().filter(eligible).filter(c=>subsFor(c).length).length;
+const PROGRAMS=CARDS.slice(1);
+const youngOnly=c=>/18–26|Genç/.test(c.audience||"");
+const eligible=c=>!youngOnly(c)||state.young;
+const needsJoin=c=>!/^Detaylar/.test(c.join||"");
+// Kullanıcının kartlarına göre her abonelik için en değerli kampanya
+function recFor(s){
+  const cs=matchesFor(s).map(m=>m.c).filter(eligible),val=c=>c.cap||0;
+  const own=cs.filter(c=>state.myCards.includes(c.program)).sort((a,b)=>val(b)-val(a)||(b.program===s.card)-(a.program===s.card));
+  const other=cs.filter(c=>!state.myCards.includes(c.program)).sort((a,b)=>val(b)-val(a));
+  return {best:own[0]||null,other:other[0]||null};
+}
+// Tahmini kazanç: kampanya metninde yüzde varsa ücretin o oranı; üst limiti ve ücreti aşmaz
+function gainOf(s,c){if(!c||!c.cap)return 0;const m=/%\s?(\d+)/.exec(c.reward||"");const base=m?s.price*parseInt(m[1],10)/100:c.cap;return Math.round(Math.min(c.cap,base,s.price))}
+function inPeriod(c,pay){return !(c.end&&pay>new Date(c.end+"T00:00:00"))&&!(c.start&&pay<new Date(c.start+"T00:00:00"))}
+// Bu dönemki ödemelerde doğru kart ve katılımla alınabilecek toplam (tahmini)
+function potential(){let sum=0,n=0;state.subs.forEach(s=>{const c=recFor(s).best;if(!c||!inPeriod(c,nextDate(s)))return;const g=gainOf(s,c);if(g>0){sum+=g;n++}});return {sum,n}}
+// Ödeme günü geçmiş, kartı doğru ve katılımı tamam abonelikleri tasarruf sayacına yazar (ay başına bir kez)
+function logSavings(){
+  const ym=iso(today).slice(0,7);let ch=false;
+  state.subs.forEach(s=>{const c=recFor(s).best;if(!c||s.card!==c.program)return;if(needsJoin(c)&&!state.joined[c.id])return;
+    const d=new Date(s.next+"T00:00:00");if(isNaN(d)||d>today)return;
+    let pay=d;
+    if(s.cycle==="m"){const last=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();pay=new Date(today.getFullYear(),today.getMonth(),Math.min(d.getDate(),last))}
+    else{pay=new Date(today.getFullYear(),d.getMonth(),d.getDate())}
+    if(iso(pay).slice(0,7)!==ym||pay>today||!inPeriod(c,pay))return;
+    const g=gainOf(s,c),k=s.id+"|"+c.id+"|"+ym;
+    if(g>0&&!state.saved[k]){state.saved[k]={a:g,n:s.name,p:c.program,d:iso(pay)};ch=true}});
+  if(ch)save();
+}
+const savedList=()=>Object.values(state.saved).filter(x=>x&&x.d&&x.d.slice(0,4)===String(today.getFullYear())).sort((a,b)=>b.d.localeCompare(a.d));
+const savedYear=()=>savedList().reduce((a,x)=>a+(x.a||0),0);
+function calUrl(s){
+  const d=nextDate(s),e=new Date(d);e.setDate(e.getDate()+1);const f=x=>iso(x).replace(/-/g,"");
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(s.name+" ödemesi ("+tl(s.price)+" TL)")+"&dates="+f(d)+"/"+f(e)+"&recur="+encodeURIComponent("RRULE:FREQ="+(s.cycle==="y"?"YEARLY":"MONTHLY"))+"&details="+encodeURIComponent("Abonelik Cüzdanı hatırlatması. Ödemeden önce uygun kart kampanyasına bak.");
+}
+// Hızlı ekleme: fiyatı bilinen servisler campaigns.json içindeki fiyat tablosundan gelir
+const QUICK_CAT={spotify:"Müzik"};
+const QUICK_EXTRA=[["ChatGPT Plus","Verimlilik"],["iCloud+","Bulut"],["Google One","Bulut"],["Apple Music","Müzik"],["Xbox Game Pass","Oyun"],["PlayStation Plus","Oyun"],["Canva","Verimlilik"]];
+function quickList(){
+  const a=((FEED.prices||{}).services||[]).map(v=>({name:v.name,cat:QUICK_CAT[v.id]||"Eğlence",plans:v.plans||[]}));
+  return a.concat(QUICK_EXTRA.map(x=>({name:x[0],cat:x[1],plans:[]})));
+}
+// Ödeme kampanya dönemine düşüyorsa: katıl ve/veya ödeme kartını değiştir
+function todos(){
+  const out=[];
+  state.subs.forEach(s=>{const c=recFor(s).best;if(!c)return;
+    const pay=nextDate(s);
+    if(c.end&&pay>new Date(c.end+"T00:00:00"))return;
+    if(c.start&&pay<new Date(c.start+"T00:00:00"))return;
+    const needJ=needsJoin(c)&&!state.joined[c.id],needCard=s.card!==c.program;
+    if(needJ||needCard)out.push({s,c,days:daysLeft(s),needJ,needCard});});
+  return out.sort((a,b)=>a.days-b.days);
+}
+function todoBlock(){
+  if(!state.subs.length)return '';
+  if(!state.myCards.length)return '<section class="card row"><span><b>Hangi kartların var?</b><br><span class="mt">Seç, her abonelik için bu ay en çok kazandıran kartı söyleyelim.</span></span><button class="btn btn-p" type="button" data-go="offers">Kartlarımı seç</button></section>';
+  const t=todos();
+  if(!t.length)return '<section class="card"><h2>Bu ay kaçırma</h2><p class="sub" style="margin-top:6px">Şu an yapman gereken bir şey yok. Kampanyalı aboneliklerin doğru kartla ödeniyor.</p></section>';
+  return '<section class="card"><div class="row"><h2>Bu ay kaçırma</h2><span class="pill p-acc">'+t.length+' adım</span></div><div class="list">'+t.map(x=>
+    '<div class="todo"><div style="min-width:0"><span class="nm">'+esc(x.s.name)+'</span> <span class="mt">'+(x.days===0?'bugün':x.days+' gün sonra')+' çekilecek'+(gainOf(x.s,x.c)?' · yaklaşık <b>'+tl(gainOf(x.s,x.c))+' TL</b> geri alırsın':'')+'</span>'+
+    '<ol class="steps">'+(x.needJ?'<li>Ödemeden önce katıl: '+esc(x.c.join)+'</li>':'')+(x.needCard?'<li>Ödeme kartını <b>'+esc(x.c.program)+'</b> yap</li>':'')+'</ol>'+
+    '<a class="link" href="'+esc(x.c.url)+'" target="_blank" rel="noopener">'+esc(x.c.program)+': '+esc(x.c.title)+' ↗</a></div>'+
+    (x.needJ?'<button class="btn btn-g" type="button" data-joined="'+esc(x.c.id)+'">Katıldım</button>':'')+'</div>').join("")+'</div></section>';
+}
+// Zam radarı: fiyat tablosu campaigns.json içindeki prices alanından gelir
+const svcFor=s=>{const n=s.name.toLocaleLowerCase("tr-TR");return ((FEED.prices||{}).services||[]).find(v=>(v.keywords||[]).some(k=>n.includes(k)))||null};
+function priceAlert(s){
+  if(s.cycle!=="m")return null;
+  const v=svcFor(s);if(!v||!v.plans.length)return null;
+  if(v.plans.some(p=>Math.abs(s.price-p.price)<=1))return null; // güncel bir paketin fiyatıyla aynıysa zam yok say
+  const hit=v.plans.find(p=>p.prev!=null&&Math.abs(s.price-p.prev)<=1);
+  if(hit)return {kind:"zam",s,v,p:hit,pct:Math.round((hit.price/hit.prev-1)*100)};
+  const min=Math.min(...v.plans.map(p=>p.price));
+  if(s.price<min-1)return {kind:"eski",s,v,min};
+  return null;
+}
+const recentChanges=()=>((FEED.prices||{}).services||[]).filter(v=>v.changed&&(today-new Date(v.changed+"T00:00:00"))/864e5<=60);
+function priceBlock(){
+  const al=state.subs.map(priceAlert).filter(Boolean),mine=new Set(al.map(a=>a.v.id));
+  const others=recentChanges().filter(v=>!mine.has(v.id));
+  if(!al.length&&!others.length)return '';
+  const src=v=>'<a class="link" href="'+esc(v.url)+'" target="_blank" rel="noopener">Kaynak ↗</a>';
+  return '<section class="card"><div class="row"><h2>Zam radarı</h2>'+(al.length?'<span class="pill p-warn">'+al.length+' abonelik</span>':'')+'</div><div class="list">'+
+  al.map(a=>{
+    if(a.kind==="eski")return '<div class="todo"><div style="min-width:0"><span class="nm">'+esc(a.s.name)+'</span> <span class="mt">Girdiğin '+tl(a.s.price)+' TL, güncel en ucuz paketin ('+tl(a.min)+' TL) altında. Fiyat değişmiş olabilir.</span><br>'+src(a.v)+'</div><button class="btn btn-g" type="button" data-edit="'+esc(a.s.id)+'">Düzenle</button></div>';
+    const diff=a.p.price-a.p.prev,d=daysLeft(a.s);
+    return '<div class="todo"><div style="min-width:0"><span class="nm">'+esc(a.s.name)+'</span> <span class="mt">'+esc(a.p.name)+' paketi '+tl(a.p.prev)+' TL → <b>'+tl(a.p.price)+' TL</b> (+%'+a.pct+')</span>'+
+    '<p class="mt" style="margin:4px 0">'+(d===0?'Bugünkü':d+' gün sonraki')+' ödemen muhtemelen '+tl(a.p.price)+' TL olacak, yılda '+tl(Math.round(diff*12))+' TL fazla. '+esc(a.v.note||'')+'</p>'+src(a.v)+'</div>'+
+    '<button class="btn btn-g" type="button" data-setprice="'+esc(a.s.id)+'|'+a.p.price+'">Fiyatı güncelle</button></div>';
+  }).join("")+
+  others.map(v=>'<div class="todo"><div style="min-width:0"><span class="nm">'+esc(v.name)+' zam yaptı</span> <span class="mt">'+v.plans.filter(p=>p.prev).map(p=>esc(p.name)+' '+tl(p.prev)+' → '+tl(p.price)+' TL').join(' · ')+'</span><br>'+src(v)+'</div></div>').join("")+
+  '</div><p class="mt" style="margin-top:8px">Fiyatlar '+trDate(FEED.prices.checked)+' tarihinde kontrol edildi.</p></section>';
+}
+const totalMonthly=()=>state.subs.reduce((a,s)=>a+monthly(s),0);
+
+function itemRow(s,extra){
+  return '<button class="item" type="button" data-edit="'+esc(s.id)+'">'+logo(s)+
+    '<span style="min-width:0"><span class="nm">'+esc(s.name)+'</span><br><span class="mt num">'+tl(s.price)+' TL / '+(s.cycle==="y"?"yıl":"ay")+' · '+trDate(iso(nextDate(s)))+'</span>'+(extra||"")+'</span>'+
+    '<span class="right">'+pill(daysLeft(s))+(s.trial?'<span class="pill p-acc">Deneme</span>':'')+'</span></button>';
+}
+function sampleBanner(){return state.isSample&&state.subs.length?'<div class="sample"><span>Örnek verilerle açıldı. Kendi aboneliklerini eklemek için önce temizleyebilirsin.</span><button type="button" data-act="clear">Örnekleri temizle</button></div>':''}
+function emptyState(){return '<div class="card empty"><p><b>Henüz abonelik yok.</b></p><p>Netflix, Spotify, internet paketi gibi düzenli ödemelerini ekle; toplamı ve kalan günleri burada görürsün.</p><button class="btn btn-p" type="button" data-act="add">+ İlk aboneliği ekle</button></div>'}
+
+function newsCard(c,compact){
+  const d=cDays(c),mine=subsFor(c);
+  const reward=c.cap?tl(c.cap)+' TL':'Hediye';
+  return '<article class="offer"><div class="rate" style="font-size:'+(c.cap&&c.cap>=1000?'15px':'17px')+'">'+reward+'<small>'+(c.cap?'EN FAZLA':'ÜYELİK')+'</small></div><div style="min-width:0">'+
+  '<span class="mt">'+esc(c.program)+' · '+esc(c.bank)+'</span><h3>'+esc(c.title)+'</h3>'+
+  '<div class="terms"><span>'+esc(c.reward)+'</span>'+(c.audience?'<span>'+esc(c.audience)+'</span>':'')+(c.end?'<span>Son gün '+trDate(c.end)+(c.detailChecked?'':' (yaklaşık)')+'</span>'+pill(d):'')+'</div>'+
+  (mine.length?'<div class="match">Senin için: '+mine.map(s=>esc(s.name)+(s.card===c.program?' (bu kartla ödüyorsun)':'')).join(", ")+'</div>':'')+
+  (compact?'':'<div class="how">Katılım: '+esc(c.join)+'</div>')+
+  '<div class="how"><a class="link" href="'+esc(c.url)+'" target="_blank" rel="noopener">Kaynağa git ↗</a></div>'+
+  '</div></article>';
+}
+function feedNote(){
+  if(feedState==="loading")return '<p class="sub">Kampanyalar yükleniyor…</p>';
+  if(feedState==="error")return '<div class="note">Kampanya listesi şu an yüklenemedi. Sayfayı yenilemeyi dene.</div>';
+  return '';
+}
+function vHome(){
+  const subs=[...state.subs].sort((a,b)=>daysLeft(a)-daysLeft(b));
+  const week=subs.filter(s=>daysLeft(s)<=7), trials=subs.filter(s=>s.trial);
+  const thisMonth=subs.filter(s=>{const d=nextDate(s);return d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear()}).reduce((a,s)=>a+s.price,0);
+  const mc=matchedCount(),pot=potential();
+  const top=[...state.subs].sort((a,b)=>monthly(b)-monthly(a)).slice(0,3);
+  const news=activeCampaigns().filter(eligible).sort((a,b)=>(subsFor(b).length>0)-(subsFor(a).length>0)||(cDays(a)??999)-(cDays(b)??999)).slice(0,4);
+  return '<div class="view">'+sampleBanner()+
+  '<div><h1>Merhaba 👋</h1><p class="sub">Aboneliklerin ve sana uyan kampanyalar tek yerde.</p></div>'+
+  (state.subs.length?
+  '<section class="hero"><div><small>Aylık toplam abonelik giderin</small><div class="big num">'+tl(Math.round(totalMonthly()))+' <span>TL</span></div>'+
+  '<div class="meta"><span>Yıllık <b class="num">'+tl(Math.round(totalMonthly()*12))+' TL</b></span><span>Bu ay kalan ödemeler <b class="num">'+tl(thisMonth)+' TL</b></span><span><b>'+state.subs.length+'</b> abonelik</span></div></div>'+
+  (pot.sum>0?'<div class="gain"><small>Bu dönem doğru kartla geri alabileceğin (tahmini)</small><b class="num">'+tl(pot.sum)+' TL</b><button class="link" style="color:#fff;text-decoration:underline" type="button" data-go="subs">'+pot.n+' abonelikte fırsat var</button></div>':mc>0?'<div class="gain"><small>Aboneliklerine uyan güncel kampanya</small><b class="num">'+mc+' kampanya</b><button class="link" style="color:#fff;text-decoration:underline" type="button" data-go="offers">Kampanyaları gör</button></div>':'')+'</section>'+
+  '<div class="tiles">'+
+   '<button class="tile" type="button" data-go="subs"><span class="ic" style="background:var(--accent-soft);color:var(--accent)">'+ICONS.cal.replace('<svg','<svg width="18" height="18"')+'</span><span class="lbl">7 gün içinde ödenecek</span><span class="val">'+week.length+' abonelik</span></button>'+
+   '<button class="tile" type="button" data-go="subs"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">'+ICONS.warn.replace('<svg','<svg width="18" height="18"')+'</span><span class="lbl">Deneme süresi bitecek</span><span class="val" style="color:var(--bad)">'+trials.length+' abonelik</span></button>'+
+  '</div>':emptyState())+todoBlock()+priceBlock()+
+  '<section class="view" style="gap:12px"><div class="row"><h2>Kampanya haberleri</h2><button class="link" type="button" data-go="offers">Tümü</button></div>'+
+  (FEED.updatedAt?'<p class="sub" style="font-size:13px">Banka kampanya sayfalarından derlendi · son güncelleme '+trDate(FEED.updatedAt)+'</p>':'')+
+  feedNote()+news.map(c=>newsCard(c,true)).join("")+'</section>'+
+  (state.subs.length?'<div class="grid2"><section class="card"><div class="row"><h2>Yaklaşan ödemeler</h2><button class="link" type="button" data-go="subs">Tümünü gör</button></div><div class="list">'+subs.slice(0,5).map(s=>itemRow(s)).join("")+'</div></section>'+
+  '<section class="card"><div class="row"><h2>En pahalı aboneliklerin</h2></div><div class="list">'+top.map(s=>itemRow(s)).join("")+'</div></section></div>':'')+
+  '</div>';
+}
+function vSubs(){
+  const q=state.q.toLocaleLowerCase("tr-TR");
+  let subs=state.subs.filter(s=>(state.filter==="Tümü"||s.cat===state.filter)&&s.name.toLocaleLowerCase("tr-TR").includes(q)).sort((a,b)=>daysLeft(a)-daysLeft(b));
+  return '<div class="view">'+sampleBanner()+'<div class="row"><h1>Abonelikler</h1><button class="btn btn-p" type="button" data-act="add">+ Ekle</button></div>'+
+  '<div class="toolbar"><label class="search">'+ICONS.search+'<input id="q" type="search" placeholder="Abonelik ara…" value="'+esc(state.q)+'" aria-label="Abonelik ara"></label></div>'+
+  '<div class="seg" role="group" aria-label="Kategori">'+["Tümü"].concat(CATS).map(c=>'<button type="button" data-filter="'+c+'" aria-pressed="'+(state.filter===c)+'">'+c+'</button>').join("")+'</div>'+
+  (state.subs.length?'<section class="card"><div class="list">'+(subs.length?subs.map(s=>{const r=recFor(s);
+    const ex=r.best?'<br><span class="mt" style="color:var(--good)">'+(s.card===r.best.program?'✓ Doğru kartla ödüyorsun · ':'Bu ay '+esc(r.best.program)+' ile öde · ')+esc(r.best.title)+(gainOf(s,r.best)?' · yaklaşık '+tl(gainOf(s,r.best))+' TL kazanç':'')+'</span>':
+      (r.other?'<br><span class="mt">'+esc(r.other.program)+' kartın olsaydı: '+esc(r.other.title)+'</span>':'');
+    const pa=priceAlert(s),zx=pa?'<br><span class="mt" style="color:var(--warn)">'+(pa.kind==="zam"?'Zam geldi: yeni fiyat '+tl(pa.p.price)+' TL':'Fiyat güncel olmayabilir')+'</span>':'';
+    return itemRow(s,zx+ex)}).join(""):'<p class="empty">Bu aramaya uyan abonelik yok.</p>')+'</div></section>':emptyState())+'</div>';
+}
+function vOffers(){
+  const list=activeCampaigns().filter(eligible).sort((a,b)=>(subsFor(b).length>0)-(subsFor(a).length>0)||(cDays(a)??999)-(cDays(b)??999));
+  return '<div class="view"><div><h1>Kampanyalar</h1><p class="sub">Abonelik, dijital platform ve fatura kampanyaları. Sana uyanlar en üstte.</p></div>'+
+  '<section class="card" style="display:flex;flex-direction:column;gap:12px"><div><h2>Kartlarım</h2><p class="sub" style="font-size:13px">Hangi kredi kartları ve dijital cüzdanlar (Papara, Papel, Enpara, ON, Tosla) sende var? Öneriler buna göre yapılır, kart numarası istemiyoruz.</p></div>'+
+  '<div class="seg" role="group" aria-label="Kartlarım">'+PROGRAMS.map(p=>'<button type="button" data-card="'+p+'" aria-pressed="'+state.myCards.includes(p)+'">'+p+'</button>').join("")+'</div>'+
+  '<label class="chk"><input id="young" type="checkbox"'+(state.young?' checked':'')+'> 18–26 yaş arasındayım (gençlere özel kampanyaları da göster)</label></section>'+
+  '<div class="note"><span>Bankaların kampanya sayfalarından otomatik derlenir'+(FEED.updatedAt?' · son güncelleme '+trDate(FEED.updatedAt):'')+'. Katılmadan önce koşulları kaynak sayfada kontrol et; bazı kampanyalarda harcamadan önce katılmak gerekiyor.</span></div>'+
+  feedNote()+list.map(c=>newsCard(c,false)).join("")+
+  (FEED.sources.length?'<section class="card"><h2>Taranan kaynaklar</h2><div class="list" style="margin-top:8px">'+FEED.sources.map(x=>'<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><a class="link" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.program)+' · '+esc(x.bank)+'</a><span class="mt">'+esc(x.status==="ok"?"tarandı":x.status)+'</span></div>').join("")+'</div></section>':'')+
+  '</div>';
+}
+function donut(parts,total){
+  const R=70,C=2*Math.PI*R;let off=0;
+  const segs=parts.map(p=>{const len=total?p.v/total*C:0;const el='<circle r="'+R+'" cx="100" cy="100" fill="none" stroke="var('+CAT_COLOR[p.k]+')" stroke-width="26" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 100 100)"/>';off+=len;return el}).join("");
+  return '<svg viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kategori dağılımı"><circle r="'+R+'" cx="100" cy="100" fill="none" stroke="var(--surface-2)" stroke-width="26"/>'+segs+
+  '<text x="100" y="98" text-anchor="middle" fill="var(--fg)" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22">'+tl(Math.round(total))+' TL</text><text x="100" y="120" text-anchor="middle" fill="var(--muted)" font-size="12">aylık toplam</text></svg>';
+}
+function vStats(){
+  if(!state.subs.length)return '<div class="view"><h1>Analiz</h1>'+emptyState()+dataCard()+'</div>';
+  const total=totalMonthly();
+  const parts=CATS.map(k=>({k,v:state.subs.filter(s=>s.cat===k).reduce((a,s)=>a+monthly(s),0)})).filter(p=>p.v>0).sort((a,b)=>b.v-a.v);
+  const subs=[...state.subs].sort((a,b)=>monthly(b)-monthly(a));
+  const max=monthly(subs[0]);
+  const yearlyOnes=state.subs.filter(s=>s.cycle==="y");
+  const pot=potential(),sv=savedList(),svSum=savedYear();
+  const zam=state.subs.map(priceAlert).filter(a=>a&&a.kind==="zam").reduce((a,x)=>a+(x.p.price-x.p.prev)*12,0);
+  return '<div class="view"><div><h1>Analiz</h1><p class="sub">Yıllık abonelikler aylığa bölünerek hesaplanır.</p></div>'+
+  '<section class="card"><div class="row"><h2>'+today.getFullYear()+' özeti</h2><span class="pill p-acc">Tasarruf sayacı</span></div><div class="yr">'+
+   '<div class="tile"><span class="lbl">Yıllık abonelik giderin</span><span class="val num">'+tl(Math.round(total*12))+' TL</span></div>'+
+   '<div class="tile"><span class="lbl">Bu yıl kampanyalarla kazandığın</span><span class="val num" style="color:var(--good)">'+tl(svSum)+' TL</span></div>'+
+   '<div class="tile"><span class="lbl">Bu dönem alabileceğin</span><span class="val num">'+tl(pot.sum)+' TL</span></div>'+
+   (zam>0?'<div class="tile"><span class="lbl">Zamların yıllık etkisi</span><span class="val num" style="color:var(--warn)">+'+tl(Math.round(zam))+' TL</span></div>':'')+
+  '</div>'+
+  (sv.length?'<div class="list" style="margin-top:12px">'+sv.slice(0,8).map(x=>'<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>'+esc(x.n)+' <span class="mt">· '+esc(x.p)+' · '+trDate(x.d)+'</span></span><b class="num" style="color:var(--good)">+'+tl(x.a)+' TL</b></div>').join("")+'</div>':
+   '<p class="mt" style="margin-top:12px">Sayaç, ödeme günü geçen ve doğru kartla ödenen kampanyalı abonelikleri her ay kendisi ekler. Tutarlar kampanya koşullarına göre tahminidir.</p>')+
+  '</section>'+
+  '<div class="grid2"><section class="card"><h2>Kategori dağılımı</h2><div class="donut-wrap" style="margin-top:14px">'+donut(parts,total)+
+  '<div class="legend">'+parts.map(p=>'<div class="lg"><i style="background:var('+CAT_COLOR[p.k]+')"></i><span>'+p.k+'</span><b class="num">'+tl(Math.round(p.v))+' TL</b><span class="pc num">%'+Math.round(p.v/total*100)+'</span></div>').join("")+'</div></div></section>'+
+  '<section class="card"><h2>Abonelik bazında aylık maliyet</h2><div class="legend" style="margin-top:14px">'+subs.map(s=>'<div><div class="row" style="font-size:14px"><span>'+esc(s.name)+'</span><b class="num">'+tl(Math.round(monthly(s)))+' TL</b></div><div class="bar"><span style="width:'+(monthly(s)/max*100)+'%;background:var('+CAT_COLOR[s.cat]+')"></span></div></div>').join("")+'</div></section></div>'+
+  '<section class="card"><h2>Özet</h2><div class="tiles" style="margin-top:12px">'+
+   '<div class="tile"><span class="lbl">En pahalı abonelik</span><span class="val">'+esc(subs[0].name)+' · '+tl(Math.round(monthly(subs[0])))+' TL</span></div>'+
+   '<div class="tile"><span class="lbl">En çok harcanan kategori</span><span class="val">'+parts[0].k+' · %'+Math.round(parts[0].v/total*100)+'</span></div>'+
+   '<div class="tile"><span class="lbl">Yıllık toplam</span><span class="val num">'+tl(Math.round(total*12))+' TL</span></div>'+
+   '<div class="tile"><span class="lbl">Yıllık ödenenler</span><span class="val">'+yearlyOnes.length+' abonelik</span></div>'+
+  '</div></section>'+dataCard()+'</div>';
+}
+function dataCard(){return '<section class="card"><h2>Verilerim</h2><p class="sub" style="font-size:13px;margin:6px 0 12px">Aboneliklerin sadece bu cihazda saklanır. Başka bir telefona ya da tarayıcıya taşımak için yedek kodunu kopyala, diğer cihazda içe aktar.</p><div class="two"><button class="btn btn-g" type="button" data-act="export">Yedek kodu al</button><button class="btn btn-g" type="button" data-act="import">İçe aktar</button></div></section>'}
+function dataSheet(mode){
+  const root=document.getElementById("sheetRoot"),exp=mode==="export";
+  const code=exp?JSON.stringify({v:2,subs:state.subs,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved}):"";
+  root.innerHTML='<div class="scrim" data-close><form class="sheet" id="df" role="dialog" aria-modal="true" aria-labelledby="dh">'+
+  '<div class="row"><h2 id="dh">'+(exp?"Yedek kodu":"İçe aktar")+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+
+  '<p class="sub" style="font-size:13px">'+(exp?"Bu kodu kopyala ve diğer cihazda Analiz > Verilerim > İçe aktar bölümüne yapıştır.":"Diğer cihazdan aldığın yedek kodunu yapıştır. Bu cihazdaki liste onunla değiştirilir.")+'</p>'+
+  '<div class="field"><label for="d-code">Yedek kodu</label><textarea id="d-code"'+(exp?' readonly':'')+' spellcheck="false">'+esc(code)+'</textarea></div>'+
+  '<p class="err" id="d-err" hidden></p>'+
+  '<button class="btn btn-p" type="submit">'+(exp?"Kopyala":"Yükle")+'</button></form></div>';
+  root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.matches("[data-close]"))root.innerHTML=""});
+  const ta=document.getElementById("d-code"),err=document.getElementById("d-err");
+  if(exp)setTimeout(()=>{ta.focus();ta.select()},0);
+  document.getElementById("df").addEventListener("submit",e=>{e.preventDefault();
+    if(exp){ta.select();let ok=false;try{ok=document.execCommand("copy")}catch(_){}
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(ta.value).catch(()=>{});
+      err.textContent=ok?"Kopyalandı.":"Kod seçildi; kopyalamak için basılı tut ya da Ctrl+C kullan.";err.hidden=false;return}
+    try{const p=JSON.parse(ta.value.trim());
+      if(!p||!Array.isArray(p.subs))throw 0;
+      const subs=p.subs.filter(x=>x&&typeof x.name==="string"&&x.name.trim()&&typeof x.price==="number"&&x.price>=0&&/^\d{4}-\d{2}-\d{2}$/.test(x.next||"")).map((x,i)=>({id:"u"+Date.now()+i,name:x.name.slice(0,60),price:x.price,cycle:x.cycle==="y"?"y":"m",next:x.next,cat:CATS.includes(x.cat)?x.cat:"Diğer",card:CARDS.includes(x.card)?x.card:CARDS[0],trial:!!x.trial}));
+      if(!subs.length&&p.subs.length)throw 0;
+      state.subs=subs;state.isSample=false;
+      state.myCards=Array.isArray(p.myCards)?p.myCards.filter(c=>PROGRAMS.includes(c)):[];
+      state.young=!!p.young;state.joined=p.joined&&typeof p.joined==="object"?p.joined:{};state.saved={};
+      save();root.innerHTML="";render();
+    }catch(_){err.textContent="Bu kod okunamadı. Yedek kodunun tamamını yapıştırdığından emin ol.";err.hidden=false}
+  });
+}
+function render(){
+  const navHtml=VIEWS.map(([k,l])=>'<button class="nav-btn" type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[{home:"home",subs:"list",offers:"tag",stats:"chart"}[k]]+l+'</button>').join("");
+  document.getElementById("railNav").innerHTML=navHtml;
+  const tb=VIEWS.map(([k,l])=>'<button type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[{home:"home",subs:"list",offers:"tag",stats:"chart"}[k]]+l+'</button>');
+  tb.splice(2,0,'<button class="fab" type="button" data-act="add" aria-label="Abonelik ekle">'+ICONS.plus+'</button>');
+  document.getElementById("tabbar").innerHTML=tb.join("");
+  const m=document.getElementById("main");
+  m.innerHTML=({home:vHome,subs:vSubs,offers:vOffers,stats:vStats})[state.view]();
+  const q=document.getElementById("q");
+  if(q)q.addEventListener("input",e=>{state.q=e.target.value;const pos=e.target.selectionStart;render();const n=document.getElementById("q");n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}});
+}
+function openSheet(id){
+  const s=id?state.subs.find(x=>x.id===id):null;
+  const v=s||{name:"",price:"",cycle:"m",next:plus(7),cat:"Eğlence",card:CARDS[0],trial:false};
+  const root=document.getElementById("sheetRoot");
+  root.innerHTML='<div class="scrim" data-close><form class="sheet" id="f" role="dialog" aria-modal="true" aria-labelledby="sh">'+
+  '<div class="row"><h2 id="sh">'+(s?"Aboneliği düzenle":"Yeni abonelik ekle")+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+
+  '<p class="sub" style="font-size:13px">Bilgilerini gir, toplamı ve kalan günü biz hesaplayalım. Hiçbir banka hesabına bağlanmıyoruz.</p>'+
+  (s?'':'<div class="field"><label>Hızlı ekle</label><div class="chips" id="quick">'+quickList().map((x,i)=>'<button type="button" data-q="'+i+'" aria-pressed="false">'+badge(x.name,true)+esc(x.name)+'</button>').join("")+'</div><div class="chips" id="quickPlans"></div></div>')+
+  '<div class="field"><label for="f-name">Abonelik adı</label><input id="f-name" required placeholder="Örn: Netflix" value="'+esc(v.name)+'"></div>'+
+  '<div class="two"><div class="field"><label for="f-price">Ücret (TL)</label><input id="f-price" type="number" min="0" step="0.01" inputmode="decimal" required placeholder="299" value="'+esc(v.price)+'"></div>'+
+  '<div class="field"><label for="f-cycle">Ödeme döngüsü</label><select id="f-cycle"><option value="m"'+(v.cycle==="m"?" selected":"")+'>Aylık</option><option value="y"'+(v.cycle==="y"?" selected":"")+'>Yıllık</option></select></div></div>'+
+  '<div class="two"><div class="field"><label for="f-next">Sonraki ödeme</label><input id="f-next" type="date" required value="'+esc(v.next)+'"></div>'+
+  '<div class="field"><label for="f-cat">Kategori</label><select id="f-cat">'+CATS.map(c=>'<option'+(c===v.cat?" selected":"")+'>'+c+'</option>').join("")+'</select></div></div>'+
+  '<div class="field"><label for="f-card">Hangi kartla ödüyorsun?</label><select id="f-card">'+CARDS.map(c=>'<option'+(c===v.card?" selected":"")+'>'+c+'</option>').join("")+'</select></div>'+
+  '<label class="chk"><input id="f-trial" type="checkbox"'+(v.trial?" checked":"")+'> Deneme süresinde</label>'+
+  '<p class="err" id="f-err" hidden></p>'+
+  '<button class="btn btn-p" type="submit">Kaydet</button>'+
+  (s?'<a class="btn btn-g" style="text-align:center;text-decoration:none" href="'+esc(calUrl(s))+'" target="_blank" rel="noopener">Ödeme gününü takvime ekle ↗</a>':'')+
+  (s?'<div id="delZone"><button class="btn btn-d" type="button" data-del style="width:100%">Aboneliği sil</button></div>':'')+
+  '</form></div>';
+  const f=document.getElementById("f");
+  if(!s){const ql=quickList(),qp=document.getElementById("quickPlans"),setV=(id,val)=>{document.getElementById(id).value=val};
+    document.getElementById("quick").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(!b)return;const x=ql[+b.dataset.q];
+      document.querySelectorAll("#quick [data-q]").forEach(o=>o.setAttribute("aria-pressed",String(o===b)));
+      setV("f-name",x.name);setV("f-cat",x.cat);setV("f-cycle","m");
+      if(x.plans.length===1)setV("f-price",x.plans[0].price);else if(x.plans.length)setV("f-price","");
+      qp.innerHTML=x.plans.length>1?x.plans.map((p,i)=>'<button type="button" data-p="'+i+'" aria-pressed="false">'+esc(p.name)+' · '+tl(p.price)+' TL</button>').join(""):"";
+      qp.onclick=ev=>{const pb=ev.target.closest("[data-p]");if(!pb)return;setV("f-price",x.plans[+pb.dataset.p].price);qp.querySelectorAll("[data-p]").forEach(o=>o.setAttribute("aria-pressed",String(o===pb)))};
+      if(!x.plans.length)document.getElementById("f-price").focus();
+    });}
+  setTimeout(()=>{if(s)document.getElementById("f-name").focus()},0);
+  root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.matches("[data-close]"))root.innerHTML=""});
+  f.addEventListener("submit",e=>{e.preventDefault();
+    const name=document.getElementById("f-name").value.trim(),price=parseFloat(document.getElementById("f-price").value),next=document.getElementById("f-next").value;
+    const err=document.getElementById("f-err");
+    if(!name||!(price>=0)||!next){err.textContent="Ad, ücret ve sonraki ödeme tarihini doldur.";err.hidden=false;return}
+    const rec={id:s?s.id:"u"+Date.now(),name,price,cycle:document.getElementById("f-cycle").value,next,cat:document.getElementById("f-cat").value,card:document.getElementById("f-card").value,trial:document.getElementById("f-trial").checked};
+    if(s)state.subs=state.subs.map(x=>x.id===s.id?rec:x);else state.subs.push(rec);
+    save();root.innerHTML="";render();
+  });
+  const del=f.querySelector("[data-del]");
+  if(del)del.addEventListener("click",()=>{
+    document.getElementById("delZone").innerHTML='<p style="margin:0 0 8px;font-weight:600">'+esc(s.name)+' silinsin mi?</p><div class="two"><button class="btn btn-g" type="button" id="noDel">Vazgeç</button><button class="btn btn-d" type="button" id="yesDel">Evet, sil</button></div>';
+    document.getElementById("noDel").onclick=()=>openSheet(id);
+    document.getElementById("yesDel").onclick=()=>{state.subs=state.subs.filter(x=>x.id!==s.id);save();root.innerHTML="";render()};
+  });
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("sheetRoot").innerHTML=""});
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice]"); if(!t||t.closest("#sheetRoot"))return;
+  if(t.dataset.go){state.view=t.dataset.go;try{history.replaceState(null,"","#"+state.view)}catch(_){}render();window.scrollTo(0,0)}
+  else if(t.dataset.edit)openSheet(t.dataset.edit);
+  else if(t.dataset.filter){state.filter=t.dataset.filter;render()}
+  else if(t.dataset.card){const p=t.dataset.card;state.myCards=state.myCards.includes(p)?state.myCards.filter(x=>x!==p):state.myCards.concat(p);save();render()}
+  else if(t.dataset.setprice){const [id,pr]=t.dataset.setprice.split("|");state.subs=state.subs.map(x=>x.id===id?Object.assign({},x,{price:parseFloat(pr)}):x);save();render()}
+  else if(t.dataset.joined){state.joined[t.dataset.joined]=true;save();render()}
+  else if(t.dataset.act==="add")openSheet(null);
+  else if(t.dataset.act==="export"||t.dataset.act==="import")dataSheet(t.dataset.act);
+  else if(t.dataset.act==="clear"){state.subs=[];state.isSample=false;save();render()}
+});
+document.addEventListener("change",e=>{if(e.target.id==="young"){state.young=e.target.checked;save();render()}});
+document.getElementById("railAdd").addEventListener("click",()=>openSheet(null));
+// İlk gerçek kayıtta örnek bayrağı kalkar
+const _save=save; save=function(){if(state.isSample&&state.subs.some(s=>s.id.startsWith("u")))state.isSample=false;_save()};
+render();
+fetch("campaigns.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{FEED=j;feedState="ok";logSavings();render()}).catch(()=>{feedState="error";render()});
+})();
+</script>
+
+<script>
+// Kurulum çubuğu ve çevrimdışı çalışma (service worker)
+(function(){
+  var bar=document.getElementById("installBar"),txt=document.getElementById("installText"),go=document.getElementById("installGo"),ev=null,K="ac-install-kapali";
+  var standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  var closed=false;try{closed=localStorage.getItem(K)==="1"}catch(e){}
+  function show(html,withBtn){if(standalone||closed)return;txt.innerHTML=html;go.hidden=!withBtn;bar.hidden=false}
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();ev=e;show("<b>Abonelik Cüzdanı</b>'nı telefonuna kur, uygulama gibi açılsın.",true)});
+  go.addEventListener("click",function(){if(!ev)return;ev.prompt();ev.userChoice.then(function(){bar.hidden=true;ev=null})});
+  document.getElementById("installNo").addEventListener("click",function(){bar.hidden=true;try{localStorage.setItem(K,"1")}catch(e){}});
+  window.addEventListener("appinstalled",function(){bar.hidden=true});
+  var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)&&!/CriOS|FxiOS/.test(ua);
+  if(ios)show("<b>Ana ekrana ekle:</b> alttaki Paylaş simgesine, sonra \"Ana Ekrana Ekle\"ye dokun.",false);
+  if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});
+})();
+</script>
+</body>
+</html>

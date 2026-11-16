@@ -1,0 +1,939 @@
+{
+  "updatedAt": "2026-11-16",
+  "sources": [
+    {
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "url": "https://www.bonus.com.tr/kampanyalar",
+      "status": "ok"
+    },
+    {
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "status": "ok"
+    },
+    {
+      "program": "World",
+      "bank": "Yapı Kredi",
+      "url": "https://www.worldcard.com.tr/kampanyalar",
+      "status": "ok"
+    },
+    {
+      "program": "Axess",
+      "bank": "Akbank",
+      "url": "https://www.akbank.com/kampanyalar/dijital-platform-kampanyasi",
+      "status": "ok"
+    },
+    {
+      "program": "Paraf",
+      "bank": "Halkbank",
+      "url": "https://www.paraf.com.tr/tr/kampanyalar.html",
+      "status": "ilgili kampanya yok"
+    },
+    {
+      "program": "Bankkart",
+      "bank": "Ziraat Bankası",
+      "url": "https://www.bankkart.com.tr/kampanyalar",
+      "status": "ok"
+    },
+    {
+      "program": "Enpara",
+      "bank": "Enpara.com",
+      "url": "https://www.enpara.com/kampanyalar",
+      "status": "ok"
+    },
+    {
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "url": "https://www.on.com.tr/kampanyalar",
+      "status": "sayfa okunamadı (16 Kasım)"
+    },
+    {
+      "program": "Papara",
+      "bank": "Papara",
+      "url": "https://www.papara.com/en/cashback-lp",
+      "status": "ok"
+    },
+    {
+      "program": "Papel",
+      "bank": "Papel",
+      "url": "https://www.papel.com.tr/kampanyalar",
+      "status": "site otomatik okumaya kapalı"
+    },
+    {
+      "program": "Tosla",
+      "bank": "Tosla (Akbank)",
+      "url": "https://www.tosla.com/kampanyalar",
+      "status": "sayfa okunamadı"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "maximum-ssport",
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "title": "S Sport Plus yıllık üyelik 2.799 TL yerine 1.999 TL",
+      "cat": "Eğlence",
+      "keywords": [
+        "s sport"
+      ],
+      "reward": "Yıllık üyelikte 800 TL indirim",
+      "cap": 800,
+      "end": "2027-01-01",
+      "audience": "Maximum kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "detailChecked": false
+    },
+    {
+      "id": "maximum-amazon-prime",
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "title": "12 aya varan Amazon Prime üyeliği",
+      "cat": "Eğlence",
+      "keywords": [
+        "amazon",
+        "prime"
+      ],
+      "reward": "12 aya varan ücretsiz üyelik",
+      "cap": null,
+      "end": "2027-05-01",
+      "audience": "Maximum kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "detailChecked": false
+    },
+    {
+      "id": "bonus-theatre-clix",
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "title": "Theatre Clix'te 1 aylık abonelik hediye",
+      "cat": "Eğlence",
+      "keywords": [
+        "theatre clix",
+        "tiyatro"
+      ],
+      "reward": "1 aylık abonelik ücreti karta iade",
+      "cap": null,
+      "start": "2026-08-26",
+      "end": "2026-12-31",
+      "audience": "18 yaş altı çocuğunu Garanti BBVA Mobil'de ilk kez Ailem alanına ekleyenler",
+      "join": "Çocuğu Ailem alanına ekle, 24 saat sonra promosyon kodu alanına TIYATRO1 yaz",
+      "url": "https://www.bonus.com.tr/kampanyalar/bonus-theatre-clix-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "maximum-esim",
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "title": "EsimBooking.com eSIM roaming data paketlerinde Maximiles ile %40 indirim",
+      "cat": "Diğer",
+      "keywords": [
+        "esim",
+        "roaming"
+      ],
+      "reward": "Maximiles ile ödemede %40 indirim",
+      "cap": null,
+      "end": "2027-01-01",
+      "audience": "Maximiles kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "detailChecked": false
+    },
+    {
+      "id": "enpara-dijital-2026",
+      "program": "Enpara",
+      "bank": "Enpara.com",
+      "title": "Netflix, Spotify ve YouTube Premium ödemelerine %50 iade",
+      "cat": "Eğlence",
+      "keywords": [
+        "netflix",
+        "spotify",
+        "youtube"
+      ],
+      "reward": "Harcamanın %50'si, ayda en fazla 150 TL (toplam 900 TL)",
+      "cap": 150,
+      "start": "2026-02-01",
+      "end": "2026-12-31",
+      "audience": "Enpara kredi kartı sahipleri, ayın Enparalısı olanlar",
+      "join": "Enpara kredi kartıyla öde ve ay sonuna kadar Ayın Enparalısı ol; iTunes, Google Play ve fatura ile ödeme sayılmaz",
+      "url": "https://www.enpara.com/kampanyalar/netflix-spotify-youtube-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "on-dijital-2026",
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "title": "Dijital üyeliklerde %50 iade",
+      "cat": "Eğlence",
+      "keywords": [
+        "netflix",
+        "spotify",
+        "youtube",
+        "amazon",
+        "prime",
+        "hbo",
+        "exxen",
+        "gain",
+        "disney",
+        "tv+",
+        "tv plus",
+        "s sport",
+        "tod",
+        "tabii",
+        "mubi"
+      ],
+      "reward": "Ödemenin %50'si, ayda en fazla 250 TL (toplam 2.000 TL)",
+      "cap": 250,
+      "start": "2026-02-03",
+      "end": "2026-12-31",
+      "audience": "ON Dijital müşterileri (banka veya kredi kartı)",
+      "join": "ON kartıyla doğrudan platformun sitesinden/uygulamasından öde; aracı firmalar sayılmaz",
+      "url": "https://on.com.tr/dijital-uyeliklerde-50-iade-onda",
+      "detailChecked": true
+    },
+    {
+      "id": "enpara-chatgpt-gemini-2026",
+      "program": "Enpara",
+      "bank": "Enpara.com",
+      "title": "ChatGPT ve Gemini üyeliklerine %50 iade",
+      "cat": "Verimlilik",
+      "keywords": [
+        "chatgpt",
+        "gemini"
+      ],
+      "reward": "Harcamanın %50'si, ayda en fazla 250 TL (toplam 1.000 TL)",
+      "cap": 250,
+      "start": "2026-02-01",
+      "end": "2026-12-31",
+      "audience": "Enpara kredi kartı veya Encard sahipleri, ayın Enparalısı olanlar",
+      "join": "Enpara kredi kartı/Encard ile öde ve ay sonuna kadar Ayın Enparalısı ol; App Store ve Google Play ödemeleri de sayılır",
+      "url": "https://www.enpara.com/kampanyalar/chatgpt-gemini-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "enpara-oyun-2026",
+      "program": "Enpara",
+      "bank": "Enpara.com",
+      "title": "PlayStation, Steam, Epic ve Xbox'ta 750 TL'lik harcamaya 150 TL iade",
+      "cat": "Oyun",
+      "keywords": [
+        "playstation",
+        "psn",
+        "steam",
+        "epic",
+        "xbox",
+        "game pass",
+        "microsoft store"
+      ],
+      "reward": "Ayın ilk 750 TL ve üzeri tek harcamasına 150 TL (toplam 750 TL)",
+      "cap": 150,
+      "start": "2026-02-01",
+      "end": "2026-12-31",
+      "audience": "Enpara kredi kartı sahipleri, ayın Enparalısı olanlar",
+      "join": "Enpara kredi kartıyla öde ve ay sonuna kadar Ayın Enparalısı ol",
+      "url": "https://www.enpara.com/kampanyalar/oyun-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "on-fatura-hesap-2026",
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "title": "Otomatik fatura talimatına %50 iade",
+      "cat": "Diğer",
+      "keywords": [
+        "fatura",
+        "turkcell",
+        "vodafone",
+        "türk telekom",
+        "superonline",
+        "internet",
+        "elektrik",
+        "doğalgaz",
+        "su faturası"
+      ],
+      "reward": "Faturanın %50'si, fatura başına 100 TL, ayda en fazla 300 TL",
+      "cap": 300,
+      "start": "2026-01-22",
+      "end": "2026-12-31",
+      "audience": "ON Dijital'in belirlediği müşteriler (ON vadesiz hesaptan ödeme)",
+      "join": "ON Dijital'den \"Hemen Katıl\", sonra yeni fatura talimatı ver",
+      "url": "https://on.com.tr/kampanyalar/otomatik-fatura-talimati-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "on-fatura-kart-2026",
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "title": "ON Kredi Kartı'na fatura talimatına %50 iade",
+      "cat": "Diğer",
+      "keywords": [
+        "fatura",
+        "turkcell",
+        "vodafone",
+        "türk telekom",
+        "superonline",
+        "internet",
+        "elektrik",
+        "doğalgaz",
+        "su faturası"
+      ],
+      "reward": "İlk 3 faturanın %50'si, fatura başına 50 TL, ayda en fazla 150 TL",
+      "cap": 150,
+      "start": "2026-07-01",
+      "end": "2026-12-31",
+      "audience": "ON Kredi Kartı sahipleri (Turknet ve Millenicom hariç)",
+      "join": "Fatura talimatını ON Kredi Kartı'na tanımla",
+      "url": "https://on.com.tr/on-kredi-karti-otomatik-fatura-odeme-kampanyasi-2921",
+      "detailChecked": true
+    },
+    {
+      "id": "axess-genc-dijital-2026",
+      "program": "Axess",
+      "bank": "Akbank",
+      "title": "Netflix, Spotify, YouTube Premium, Disney+, BluTV, Gain ve tabii'ye %50 iade",
+      "cat": "Eğlence",
+      "keywords": [
+        "netflix",
+        "spotify",
+        "youtube",
+        "disney",
+        "blutv",
+        "hbo",
+        "gain",
+        "tabii"
+      ],
+      "reward": "Üyelik ücretinin %50'si, ayda en fazla 100 TL",
+      "cap": 100,
+      "end": "2026-12-31",
+      "audience": "18–26 yaş, Üniversiteli Akbanklı programındaki öğrenciler (Axess, Wings, Axess Öğrenci, Akbank kart)",
+      "join": "Akbank Mobil > Kampanyalar'dan Üniversiteli Akbanklı'ya katıl; App Store ve çip para ödemeleri sayılmaz",
+      "url": "https://www.akbank.com/kampanyalar/dijital-platform-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "on-tod-2026",
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "title": "TOD 12 aylık Süper Lig paketinde %15 indirim",
+      "cat": "Eğlence",
+      "keywords": [
+        "tod"
+      ],
+      "reward": "12 aylık Süper Lig Paketi 4 Ekran'da %15 indirim, kişi başı bir kez",
+      "cap": null,
+      "start": "2026-08-19",
+      "end": "2026-12-31",
+      "audience": "ON Dijital müşterileri (Digitürk uydu üyeleri hariç)",
+      "join": "ON Dijital uygulaması > Avantajlar Dünyası'ndan kodu al, epintower.com'da ya da ödeme ekranında kullan",
+      "url": "https://on.com.tr/kampanyalar/tod-tv-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "world-troy-pazarama",
+      "program": "World",
+      "bank": "Yapı Kredi",
+      "title": "TROY kartla Pazarama'da 250 TL indirim, 3.000 TL üzerine yıllık Pazarama Plus",
+      "cat": "Diğer",
+      "keywords": [
+        "pazarama"
+      ],
+      "reward": "Tek seferde 1.250 TL ve üzeri alışverişe 250 TL indirim; 3.000 TL ve üzerine yıllık Pazarama Plus üyeliği",
+      "cap": 250,
+      "end": "2026-11-22",
+      "audience": "World TROY kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.worldcard.com.tr/kampanyalar/troy-kartla-pazaramada-tek-seferde-1250-tl-ve-uzeri-alisverise-250-tl-indirim",
+      "detailChecked": false
+    },
+    {
+      "id": "maximum-troy-pazarama-plus",
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "title": "TROY kartla Pazarama'da 3.000 TL üzeri siparişe yıllık Pazarama Plus hediye",
+      "cat": "Diğer",
+      "keywords": [
+        "pazarama"
+      ],
+      "reward": "3.000 TL ve üzeri siparişe yıllık Pazarama Plus üyeliği",
+      "cap": null,
+      "end": "2026-11-23",
+      "audience": "İş Bankası TROY kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "detailChecked": false
+    },
+    {
+      "id": "bankkart-google-play-2610",
+      "program": "Bankkart",
+      "bank": "Ziraat Bankası",
+      "title": "Mastercard logolu Bankkart ile Google Play'de %50 iade",
+      "cat": "Diğer",
+      "keywords": [
+        "google play",
+        "google one",
+        "play pass"
+      ],
+      "reward": "Tek seferde 5$ ve üzeri harcamaya %50 iade, ayda en fazla 5$",
+      "cap": null,
+      "start": "2026-10-13",
+      "end": "2026-12-31",
+      "audience": "Mastercard logolu bireysel Bankkart kredi ve banka kartı sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.bankkart.com.tr/kampanyalar/e-ticaret/mastercard-logolu-bankkartinizla-google-playde-50-indirim",
+      "detailChecked": true
+    },
+    {
+      "id": "enpara-trendyol-plus-2610",
+      "program": "Enpara",
+      "bank": "Enpara.com",
+      "title": "Trendyol Plus üyelik ücretiniz bizden",
+      "cat": "Alışveriş",
+      "keywords": [
+        "trendyol"
+      ],
+      "reward": "Enpara Kredi Kartı ile ödenen Trendyol Plus üyelik ücreti iade, ertesi ayın 7'sinde vadesiz TL hesaba",
+      "cap": null,
+      "start": "2026-10-01",
+      "end": "2026-12-31",
+      "audience": "Ayın Enparalıları",
+      "join": "Ödeme yapılan ayın son gününe kadar Ayın Enparalısı olmak; sepette alınan üyelik ve 1 TL ilk çekim hariç",
+      "url": "https://www.enpara.com/kampanyalar/trendyol-plus-uyelik-ucretiniz-bizden",
+      "detailChecked": true
+    },
+    {
+      "id": "papara-steam",
+      "program": "Papara",
+      "bank": "Papara",
+      "title": "Steam harcamalarına %50 cashback",
+      "cat": "Oyun",
+      "keywords": [
+        "steam"
+      ],
+      "reward": "%50 cashback, ayda en fazla 150 TL",
+      "cap": 150,
+      "audience": "Doğrulanmış Papara hesabı sahipleri",
+      "join": "Papara Card ile öde",
+      "url": "https://www.papara.com/en/cashback/steam",
+      "detailChecked": false
+    },
+    {
+      "id": "papara-youtube",
+      "program": "Papara",
+      "bank": "Papara",
+      "title": "YouTube aboneliğine 50 TL cashback",
+      "cat": "Eğlence",
+      "keywords": [
+        "youtube"
+      ],
+      "reward": "Sabit 50 TL cashback",
+      "cap": 50,
+      "audience": "Doğrulanmış Papara hesabı sahipleri",
+      "join": "Papara Card ile öde",
+      "url": "https://www.papara.com/en/cashback/youtube",
+      "detailChecked": false
+    },
+    {
+      "id": "papara-app-store",
+      "program": "Papara",
+      "bank": "Papara",
+      "title": "App Store dijital ürünlerine %25 cashback",
+      "cat": "Diğer",
+      "keywords": [
+        "app store",
+        "icloud",
+        "apple music",
+        "apple tv",
+        "apple one"
+      ],
+      "reward": "%25 cashback, ayda en fazla 50 TL",
+      "cap": 50,
+      "audience": "Doğrulanmış Papara hesabı sahipleri",
+      "join": "Papara Card ile öde",
+      "url": "https://www.papara.com/en/cashback/app-store",
+      "detailChecked": false
+    },
+    {
+      "id": "papara-play-store",
+      "program": "Papara",
+      "bank": "Papara",
+      "title": "Play Store dijital ürünlerine %25 cashback",
+      "cat": "Diğer",
+      "keywords": [
+        "google play",
+        "google one",
+        "play pass"
+      ],
+      "reward": "%25 cashback, ayda en fazla 50 TL",
+      "cap": 50,
+      "audience": "Doğrulanmış Papara hesabı sahipleri",
+      "join": "Papara Card ile öde",
+      "url": "https://www.papara.com/en/cashback/play-store",
+      "detailChecked": false
+    },
+    {
+      "id": "papara-internet-tv-fatura",
+      "program": "Papara",
+      "bank": "Papara",
+      "title": "İnternet ve TV faturalarına %50 cashback",
+      "cat": "Diğer",
+      "keywords": [
+        "internet",
+        "turkcell",
+        "vodafone",
+        "türk telekom",
+        "superonline",
+        "turknet",
+        "digiturk",
+        "tivibu",
+        "fatura"
+      ],
+      "reward": "%50 cashback, en fazla 50 TL",
+      "cap": 50,
+      "audience": "Doğrulanmış Papara hesabı sahipleri",
+      "join": "Faturayı Papara ile öde",
+      "url": "https://www.papara.com/en/cashback/internet-tv-faturasi",
+      "detailChecked": false
+    },
+    {
+      "id": "bonus-icloud-2611",
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "title": "iCloud ödemeleriniz kadar bonus",
+      "cat": "Bulut",
+      "keywords": [
+        "icloud"
+      ],
+      "reward": "iCloud ödemesi kadar bonus, toplam en fazla 250 TL",
+      "cap": 250,
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "audience": "18–26 yaş (kampanya için iletişim kurulan müşteriler)",
+      "join": "Garanti BBVA Mobil > Genç alanından ilk harcamadan önce \"Hemen Katıl\"",
+      "url": "https://www.bonus.com.tr/kampanyalar/bonus-icloud-odeme-kampanyalari",
+      "detailChecked": true
+    },
+    {
+      "id": "bonus-fatura-2611",
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "title": "Otomatik fatura talimatına 800 TL'ye varan bonus",
+      "cat": "Diğer",
+      "keywords": [
+        "fatura",
+        "turkcell",
+        "vodafone",
+        "türk telekom",
+        "superonline",
+        "internet",
+        "elektrik",
+        "doğalgaz"
+      ],
+      "reward": "2 talimata 200, 4 talimata 400, 6 talimata 800 TL bonus",
+      "cap": 800,
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "audience": "Tüm Bonus kart sahipleri (Altın Bonus hariç)",
+      "join": "3340'a FATURA yazıp SMS gönder (BonusFlaş, şube veya 444 0 333'ten talimatta gerekmez), sonra karttan otomatik talimat ver",
+      "url": "https://www.bonus.com.tr/kampanyalar/ofo-1126",
+      "detailChecked": true
+    },
+    {
+      "id": "bonus-gron-fitness-2611",
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "title": "Gron Fitness'ta %25 indirim",
+      "cat": "Diğer",
+      "keywords": [
+        "gron",
+        "gron fitness",
+        "spor salonu"
+      ],
+      "reward": "6 aylık ve yıllık peşin üyeliklere %25 indirim",
+      "cap": null,
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "audience": "Bonus kart sahipleri (Bonus Flexi ve Altın Bonus hariç)",
+      "join": "İlk harcamadan önce BonusFlaş'tan \"Hemen Katıl\"",
+      "url": "https://www.bonus.com.tr/kampanyalar/gron-fitness-indirim-kampanyalari",
+      "detailChecked": true
+    },
+    {
+      "id": "maximum-yapay-zeka-2611",
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "title": "2026'daki ilk yapay zekâ ödemenize 250 TL'ye varan MaxiPuan",
+      "cat": "Verimlilik",
+      "keywords": [
+        "chatgpt",
+        "openai",
+        "claude",
+        "gemini",
+        "midjourney"
+      ],
+      "reward": "250 TL'ye varan MaxiPuan",
+      "cap": 250,
+      "end": "2026-12-02",
+      "audience": "Maximum kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "detailChecked": false
+    },
+    {
+      "id": "maximum-pazarama-plus-2611",
+      "program": "Maximum",
+      "bank": "İş Bankası",
+      "title": "Pazarama'da 1.000 TL alışverişe ücretsiz aylık Pazarama Plus üyeliği",
+      "cat": "Diğer",
+      "keywords": [
+        "pazarama"
+      ],
+      "reward": "1 aylık ücretsiz Pazarama Plus",
+      "cap": null,
+      "end": "2026-12-02",
+      "audience": "Maximum kart sahipleri",
+      "join": "Detaylar kampanya sayfasında",
+      "url": "https://www.maximum.com.tr/kampanyalar",
+      "detailChecked": false
+    },
+    {
+      "id": "on-oyun-2611",
+      "title": "Oyun platformu harcamasına 300 TL iade",
+      "cat": "Oyun",
+      "keywords": [
+        "steam",
+        "playstation",
+        "psn",
+        "xbox",
+        "epic"
+      ],
+      "reward": "ON Maximum Kredi Kartı ile 3.000 TL ve üzeri ilk oyun platformu işlemine 300 TL iade",
+      "cap": 300,
+      "url": "https://www.on.com.tr/kampanyalar/oyun-platformu-kampanyasi",
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "audience": "ON Maximum Kredi Kartı sahipleri",
+      "join": "ON Mobil'de kampanya sayfasından \"Hemen Katıl\"; App Store, Google Play ve cüzdan ödemeleri sayılmaz",
+      "detailChecked": true,
+      "end": "2026-11-30",
+      "start": "2026-11-01"
+    },
+    {
+      "id": "on-chatgpt-2611",
+      "title": "ON Kredi Kartı ile ChatGPT'ye %50 iade",
+      "cat": "Verimlilik",
+      "keywords": [
+        "chatgpt",
+        "openai"
+      ],
+      "reward": "ChatGPT harcamasının %50'si, en fazla 250 TL",
+      "cap": 250,
+      "url": "https://www.on.com.tr/kampanyalar/on-kredi-karti-chatgpt-kampanyasi",
+      "program": "ON",
+      "bank": "ON Dijital Bankacılık",
+      "audience": "ON Kredi Kartı sahibi ON Dijital müşterileri",
+      "join": "İlk harcamadan önce ON Dijital'de \"Hemen Katıl\"; yalnızca ChatGPT'nin kendi sitesinden yapılan ödemeler sayılır",
+      "detailChecked": true,
+      "end": "2026-11-30",
+      "start": "2026-11-01"
+    },
+    {
+      "id": "bonus-genc-steam-2611",
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "title": "Bonus Genç'le oyun harcamalarına toplam 500 TL bonus",
+      "cat": "Oyun",
+      "keywords": [
+        "steam",
+        "itunes",
+        "geforce"
+      ],
+      "reward": "Steam, iTunes ve GeForce NOW Game+'da 300 TL ve üzeri her harcamaya 100 TL, toplam en fazla 500 TL bonus",
+      "cap": 500,
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "audience": "Bonus Genç kart ve Bonus Genç Paracard sahipleri",
+      "join": "BonusFlaş'tan \"Hemen Katıl\"; taksitli ve dijital cüzdanla yapılan ödemeler sayılmaz",
+      "url": "https://www.bonus.com.tr/kampanyalar/bonus-genc-steam-kampanyasi",
+      "detailChecked": true
+    },
+    {
+      "id": "axess-genc-oyun-2026",
+      "program": "Axess",
+      "bank": "Akbank",
+      "title": "Steam ve Epic Games harcamalarına %50 iade",
+      "cat": "Oyun",
+      "keywords": [
+        "steam",
+        "epic"
+      ],
+      "reward": "Harcamanın %50'si, ayda en fazla 100 TL",
+      "cap": 100,
+      "end": "2026-12-31",
+      "audience": "18–26 yaş, Üniversiteli Akbanklı programındaki öğrenciler (Axess, Wings, Axess Öğrenci, Akbank kart)",
+      "join": "Akbank Mobil > Kampanyalar'dan Üniversiteli Akbanklı'ya katıl; koşulları kampanya sayfasından teyit edin",
+      "url": "https://www.akbank.com/kampanyalar/oyun-platformlari-kampanyasi",
+      "detailChecked": false
+    },
+    {
+      "id": "akbank-mobilin-youtube-2611",
+      "program": "Axess",
+      "bank": "Akbank",
+      "title": "Mobilin Akbanklısı ile ücretsiz YouTube üyeliği",
+      "cat": "Eğlence",
+      "keywords": [
+        "youtube"
+      ],
+      "reward": "YouTube Premium ödemesine 120 TL chip-para (kampanya boyunca bir kez)",
+      "cap": 120,
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "audience": "Mobilin Akbanklısı Altın müşterileri (Akbank Kart, Axess, Wings, Free)",
+      "join": "Ödemeden önce Akbank Mobil > Kampanyalar'dan katıl; koşulları kampanya sayfasından teyit edin",
+      "url": "https://www.akbank.com/kampanyalar/mobilin-akbanklisi-ile-youtube-kampanyasi",
+      "detailChecked": false
+    },
+    {
+      "id": "bonus-cep-fatura-2611",
+      "program": "Bonus",
+      "bank": "Garanti BBVA",
+      "title": "Otomatik cep telefonu fatura talimatına 1.250 TL bonus",
+      "cat": "Diğer",
+      "keywords": [
+        "turkcell",
+        "vodafone",
+        "türk telekom",
+        "turk telekom",
+        "cep telefonu",
+        "gsm",
+        "fatura"
+      ],
+      "reward": "İlk otomatik cep telefonu fatura talimatına 1.250 TL bonus (talimat 12–30 Kasım arasında verilmeli, bir kez)",
+      "cap": 1250,
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "audience": "18–26 yaş, Bonus kredi kartı sahipleri (kampanya için iletişim kurulan müşteriler; maaş müşterileri hariç)",
+      "join": "Talimattan önce Garanti BBVA Mobil > Genç alanından \"Hemen Katıl\"; talimat erken iptal edilirse bonus geri alınır",
+      "url": "https://www.bonus.com.tr/kampanyalar/bonus-fatura-talimati-kampanyasi",
+      "detailChecked": true
+    }
+  ],
+  "prices": {
+    "checked": "2026-11-16",
+    "services": [
+      {
+        "id": "netflix",
+        "name": "Netflix",
+        "keywords": [
+          "netflix"
+        ],
+        "changed": "2026-10-03",
+        "note": "Ekim 2026 zammı. Mevcut üyelere yeni fiyat ödeme tarihinden önce bildiriliyor.",
+        "url": "https://www.teknoblog.com/netflix-turkiye-fiyatlari-ekim-2026/",
+        "plans": [
+          {
+            "name": "Temel",
+            "price": 259.99,
+            "prev": 189.99
+          },
+          {
+            "name": "Standart",
+            "price": 389.99,
+            "prev": 289.99
+          },
+          {
+            "name": "Premium",
+            "price": 499.99,
+            "prev": 379.99
+          }
+        ]
+      },
+      {
+        "id": "spotify",
+        "name": "Spotify",
+        "keywords": [
+          "spotify"
+        ],
+        "changed": "2026-10-01",
+        "note": "Ekim 2026 zammı, yeni dönemden itibaren mevcut üyelere de uygulanıyor.",
+        "url": "https://www.spotify.com/tr/premium/",
+        "plans": [
+          {
+            "name": "Bireysel",
+            "price": 115,
+            "prev": 99
+          },
+          {
+            "name": "Öğrenci",
+            "price": 60,
+            "prev": 55
+          },
+          {
+            "name": "Duo",
+            "price": 159,
+            "prev": 135
+          },
+          {
+            "name": "Aile",
+            "price": 199,
+            "prev": 165
+          }
+        ]
+      },
+      {
+        "id": "youtube",
+        "name": "YouTube Premium",
+        "keywords": [
+          "youtube"
+        ],
+        "changed": "2026-06-11",
+        "note": "Haziran 2026 zammı, mevcut üyelere de uygulandı. App Store'dan ödenince fiyat daha yüksek.",
+        "url": "https://www.sporx.com/youtube-premium-ne-kadar-2026-abonelik-ucretlerine-zam-geldi-youtube-premium-turkiye-fiyati-SXHBQ1165435SXQ",
+        "plans": [
+          {
+            "name": "Bireysel",
+            "price": 119.99,
+            "prev": 79.99
+          },
+          {
+            "name": "Aile",
+            "price": 239.99,
+            "prev": 159.99
+          },
+          {
+            "name": "Öğrenci",
+            "price": 79.99,
+            "prev": 52.99
+          },
+          {
+            "name": "Lite",
+            "price": 79.99,
+            "prev": 49.99
+          }
+        ]
+      },
+      {
+        "id": "disney",
+        "name": "Disney+",
+        "keywords": [
+          "disney"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Reklamlı",
+            "price": 249.9
+          },
+          {
+            "name": "Reklamsız",
+            "price": 449.9
+          }
+        ]
+      },
+      {
+        "id": "hbomax",
+        "name": "HBO Max",
+        "keywords": [
+          "hbo",
+          "blutv"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Standart",
+            "price": 229.9
+          },
+          {
+            "name": "Özel",
+            "price": 299.9
+          }
+        ]
+      },
+      {
+        "id": "prime",
+        "name": "Amazon Prime",
+        "keywords": [
+          "amazon",
+          "prime"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Prime",
+            "price": 69.9
+          },
+          {
+            "name": "Prime + reklamsız",
+            "price": 129.8
+          }
+        ]
+      },
+      {
+        "id": "exxen",
+        "name": "Exxen",
+        "keywords": [
+          "exxen"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Reklamlı",
+            "price": 270.5
+          },
+          {
+            "name": "Reklamsız",
+            "price": 381.66
+          }
+        ]
+      },
+      {
+        "id": "gain",
+        "name": "GAİN",
+        "keywords": [
+          "gain",
+          "gaın"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Premium",
+            "price": 249
+          }
+        ]
+      },
+      {
+        "id": "tabii",
+        "name": "tabii",
+        "keywords": [
+          "tabii"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Premium",
+            "price": 99
+          }
+        ]
+      },
+      {
+        "id": "mubi",
+        "name": "MUBI",
+        "keywords": [
+          "mubi"
+        ],
+        "url": "https://www.karekod.org/blog/dijital-platform-uyelik-ucretleri/",
+        "plans": [
+          {
+            "name": "Standart",
+            "price": 229
+          },
+          {
+            "name": "Öğrenci",
+            "price": 129
+          }
+        ]
+      }
+    ]
+  }
+}
