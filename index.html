@@ -152,6 +152,10 @@ h2{font-family:var(--display);font-size:17px;margin:0;letter-spacing:-.01em}
 .chips button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-weight:600;font-size:13px;color:var(--fg)}
 .chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .field textarea{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;width:100%;min-height:150px;font:12px/1.4 var(--mono,monospace);color:var(--fg);resize:vertical}
+.svrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+.svrow:last-child{border-bottom:0}
+.svq{display:inline-flex;gap:6px;margin-top:6px}
+.svq .btn{padding:6px 12px;font-size:13px;border-radius:10px}
 .yr{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
 .yr .tile .val{font-size:20px;font-family:var(--display)}
 .steps{margin:6px 0;padding-left:20px;font-size:13.5px;display:flex;flex-direction:column;gap:2px}
@@ -272,7 +276,13 @@ function recFor(s){
 function gainOf(s,c){if(!c||!c.cap)return 0;const m=/%\s?(\d+)/.exec(c.reward||"");const base=m?s.price*parseInt(m[1],10)/100:c.cap;return Math.round(Math.min(c.cap,base,s.price))}
 function inPeriod(c,pay){return !(c.end&&pay>new Date(c.end+"T00:00:00"))&&!(c.start&&pay<new Date(c.start+"T00:00:00"))}
 // Bu dönemki ödemelerde doğru kart ve katılımla alınabilecek toplam (tahmini)
-function potential(){let sum=0,n=0;state.subs.forEach(s=>{const c=recFor(s).best;if(!c||!inPeriod(c,nextDate(s)))return;const g=gainOf(s,c);if(g>0){sum+=g;n++}});return {sum,n}}
+// Aynı kampanyaya birden çok abonelik uyuyorsa üst limit aralarında paylaşılır (banka limiti toplam uygular)
+function potential(){
+  let sum=0,n=0;const used={};
+  state.subs.map(s=>({s,c:recFor(s).best})).filter(x=>x.c&&inPeriod(x.c,nextDate(x.s))).map(x=>({c:x.c,g:gainOf(x.s,x.c)})).sort((a,b)=>b.g-a.g)
+    .forEach(x=>{const g=Math.max(0,Math.min(x.g,x.c.cap-(used[x.c.id]||0)));if(g>0){used[x.c.id]=(used[x.c.id]||0)+g;sum+=g;n++}});
+  return {sum,n};
+}
 // Ödeme günü geçmiş, kartı doğru ve katılımı tamam abonelikleri tasarruf sayacına yazar (ay başına bir kez)
 function logSavings(){
   const ym=iso(today).slice(0,7);let ch=false;
@@ -282,12 +292,16 @@ function logSavings(){
     if(s.cycle==="m"){const last=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();pay=new Date(today.getFullYear(),today.getMonth(),Math.min(d.getDate(),last))}
     else{pay=new Date(today.getFullYear(),d.getMonth(),d.getDate())}
     if(iso(pay).slice(0,7)!==ym||pay>today||!inPeriod(c,pay))return;
-    const g=gainOf(s,c),k=s.id+"|"+c.id+"|"+ym;
-    if(g>0&&!state.saved[k]){state.saved[k]={a:g,n:s.name,p:c.program,d:iso(pay)};ch=true}});
+    const k=s.id+"|"+c.id+"|"+ym;if(state.saved[k])return;
+    const usedCap=Object.keys(state.saved).filter(x=>x.split("|")[1]===c.id&&x.split("|")[2]===ym).reduce((a,x)=>a+(state.saved[x].a||0),0);
+    const g=Math.max(0,Math.min(gainOf(s,c),c.cap-usedCap));
+    if(g>0){state.saved[k]={a:g,n:s.name,p:c.program,d:iso(pay)};ch=true}});
   if(ch)save();
 }
-const savedList=()=>Object.values(state.saved).filter(x=>x&&x.d&&x.d.slice(0,4)===String(today.getFullYear())).sort((a,b)=>b.d.localeCompare(a.d));
-const savedYear=()=>savedList().reduce((a,x)=>a+(x.a||0),0);
+// Kayıt durumu: ok yoksa onay bekliyor, true ise iade geldi, false ise gelmedi. Toplam yalnızca onaylananlardan oluşur.
+const savedList=()=>Object.keys(state.saved).map(k=>Object.assign({k},state.saved[k])).filter(x=>x.d&&x.d.slice(0,4)===String(today.getFullYear())).sort((a,b)=>b.d.localeCompare(a.d));
+const savedYear=()=>savedList().filter(x=>x.ok===true).reduce((a,x)=>a+(x.a||0),0);
+const savedPending=()=>savedList().filter(x=>x.ok===undefined).reduce((a,x)=>a+(x.a||0),0);
 function calUrl(s){
   const d=nextDate(s),e=new Date(d);e.setDate(e.getDate()+1);const f=x=>iso(x).replace(/-/g,"");
   return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(s.name+" ödemesi ("+tl(s.price)+" TL)")+"&dates="+f(d)+"/"+f(e)+"&recur="+encodeURIComponent("RRULE:FREQ="+(s.cycle==="y"?"YEARLY":"MONTHLY"))+"&details="+encodeURIComponent("Abonelik Cüzdanı hatırlatması. Ödemeden önce uygun kart kampanyasına bak.");
@@ -436,16 +450,21 @@ function vStats(){
   const subs=[...state.subs].sort((a,b)=>monthly(b)-monthly(a));
   const max=monthly(subs[0]);
   const yearlyOnes=state.subs.filter(s=>s.cycle==="y");
-  const pot=potential(),sv=savedList(),svSum=savedYear();
+  const pot=potential(),sv=savedList(),svSum=savedYear(),svPend=savedPending();
   const zam=state.subs.map(priceAlert).filter(a=>a&&a.kind==="zam").reduce((a,x)=>a+(x.p.price-x.p.prev)*12,0);
   return '<div class="view"><div><h1>Analiz</h1><p class="sub">Yıllık abonelikler aylığa bölünerek hesaplanır.</p></div>'+
   '<section class="card"><div class="row"><h2>'+today.getFullYear()+' özeti</h2><span class="pill p-acc">Tasarruf sayacı</span></div><div class="yr">'+
    '<div class="tile"><span class="lbl">Yıllık abonelik giderin</span><span class="val num">'+tl(Math.round(total*12))+' TL</span></div>'+
-   '<div class="tile"><span class="lbl">Bu yıl kampanyalarla kazandığın</span><span class="val num" style="color:var(--good)">'+tl(svSum)+' TL</span></div>'+
+   '<div class="tile"><span class="lbl">Bu yıl kampanyalarla kazandığın</span><span class="val num" style="color:var(--good)">'+tl(svSum)+' TL</span>'+(svPend>0?'<span class="mt num">+'+tl(svPend)+' TL onay bekliyor</span>':'')+'</div>'+
    '<div class="tile"><span class="lbl">Bu dönem alabileceğin</span><span class="val num">'+tl(pot.sum)+' TL</span></div>'+
    (zam>0?'<div class="tile"><span class="lbl">Zamların yıllık etkisi</span><span class="val num" style="color:var(--warn)">+'+tl(Math.round(zam))+' TL</span></div>':'')+
   '</div>'+
-  (sv.length?'<div class="list" style="margin-top:12px">'+sv.slice(0,8).map(x=>'<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>'+esc(x.n)+' <span class="mt">· '+esc(x.p)+' · '+trDate(x.d)+'</span></span><b class="num" style="color:var(--good)">+'+tl(x.a)+' TL</b></div>').join("")+'</div>':
+  (sv.length?'<div class="list" style="margin-top:12px">'+sv.slice(0,12).map(x=>'<div class="svrow"><span style="min-width:0">'+esc(x.n)+' <span class="mt">· '+esc(x.p)+' · '+trDate(x.d)+'</span><br>'+
+     (x.ok===true?'<span class="mt" style="color:var(--good)">✓ İade geldi</span> <button class="link" type="button" data-sv="'+esc(x.k)+'" data-ok="">Geri al</button>':
+      x.ok===false?'<span class="mt">İade gelmedi, toplama eklenmedi</span> <button class="link" type="button" data-sv="'+esc(x.k)+'" data-ok="">Geri al</button>':
+      '<span class="mt">İade hesabına geldi mi?</span> <span class="svq"><button class="btn btn-g" type="button" data-sv="'+esc(x.k)+'" data-ok="1">Geldi</button><button class="btn btn-g" type="button" data-sv="'+esc(x.k)+'" data-ok="0">Gelmedi</button></span>')+
+     '</span><b class="num" style="color:var('+(x.ok===true?'--good':'--muted')+')'+(x.ok===false?';text-decoration:line-through':'')+'">'+(x.ok===true?'+':'~')+tl(x.a)+' TL</b></div>').join("")+'</div>'+
+   '<p class="mt" style="margin-top:10px">Toplam yalnızca "Geldi" dediğin iadelerden oluşur. Onay bekleyen tutarlar kampanya koşullarına göre tahmindir.</p>':
    '<p class="mt" style="margin-top:12px">Sayaç, ödeme günü geçen ve doğru kartla ödenen kampanyalı abonelikleri her ay kendisi ekler. Tutarlar kampanya koşullarına göre tahminidir.</p>')+
   '</section>'+
   '<div class="grid2"><section class="card"><h2>Kategori dağılımı</h2><div class="donut-wrap" style="margin-top:14px">'+donut(parts,total)+
@@ -546,12 +565,13 @@ function openSheet(id){
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("sheetRoot").innerHTML=""});
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice]"); if(!t||t.closest("#sheetRoot"))return;
+  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice],[data-sv]"); if(!t||t.closest("#sheetRoot"))return;
   if(t.dataset.go){state.view=t.dataset.go;try{history.replaceState(null,"","#"+state.view)}catch(_){}render();window.scrollTo(0,0)}
   else if(t.dataset.edit)openSheet(t.dataset.edit);
   else if(t.dataset.filter){state.filter=t.dataset.filter;render()}
   else if(t.dataset.card){const p=t.dataset.card;state.myCards=state.myCards.includes(p)?state.myCards.filter(x=>x!==p):state.myCards.concat(p);save();render()}
   else if(t.dataset.setprice){const [id,pr]=t.dataset.setprice.split("|");state.subs=state.subs.map(x=>x.id===id?Object.assign({},x,{price:parseFloat(pr)}):x);save();render()}
+  else if(t.dataset.sv){const e=state.saved[t.dataset.sv];if(e){if(t.dataset.ok==="1")e.ok=true;else if(t.dataset.ok==="0")e.ok=false;else delete e.ok;save();render()}}
   else if(t.dataset.joined){state.joined[t.dataset.joined]=true;save();render()}
   else if(t.dataset.act==="add")openSheet(null);
   else if(t.dataset.act==="export"||t.dataset.act==="import")dataSheet(t.dataset.act);
