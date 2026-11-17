@@ -164,8 +164,8 @@ h2{font-family:var(--display);font-size:17px;margin:0;letter-spacing:-.01em}
   .shell{grid-template-columns:minmax(0,1fr)}
   .rail{display:none}
   main{padding-top:20px}
-  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
-  .tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0}
+  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:600;color:var(--muted);padding:4px 0;min-width:0;white-space:nowrap}
   .tabbar button svg{width:22px;height:22px}
   .tabbar button[aria-current="page"]{color:var(--accent)}
   .tabbar .fab{align-self:center;justify-self:center;width:48px;height:48px;border-radius:50%;background:var(--accent);color:var(--accent-fg);justify-content:center;margin-top:-18px;box-shadow:0 6px 18px rgba(91,79,232,.35)}
@@ -173,6 +173,20 @@ h2{font-family:var(--display);font-size:17px;margin:0;letter-spacing:-.01em}
   .donut-wrap{grid-template-columns:1fr;justify-items:center}
   .legend{width:100%}
 }
+.auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.auth-box{width:min(420px,100%);display:flex;flex-direction:column;gap:14px}
+.auth-box .brand{padding:0;justify-content:center;font-size:20px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--accent-soft);border-radius:12px;padding:4px}
+.auth-tabs button{border:0;background:none;border-radius:9px;padding:9px;font-weight:700;color:var(--muted)}
+.auth-tabs button[aria-pressed="true"]{background:var(--surface);color:var(--accent)}
+.auth .note{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.pw{position:relative}.pw input{padding-right:64px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--accent);font-weight:700;font-size:13px;padding:6px}
+body.locked .shell,body.locked .tabbar{display:none!important}
+.prof{display:flex;align-items:center;gap:14px}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px;flex:none}
+.acts{display:flex;flex-direction:column;gap:8px}
+.acts .btn{text-align:left}
 @media (prefers-reduced-motion:no-preference){.view{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
 </style>
 
@@ -188,6 +202,7 @@ h2{font-family:var(--display);font-size:17px;margin:0;letter-spacing:-.01em}
   <main id="main"></main>
 </div>
 <nav class="tabbar" id="tabbar" aria-label="Menü"></nav>
+<div id="authRoot"></div>
 <div id="sheetRoot"></div>
 
 <script>
@@ -200,9 +215,11 @@ const ICONS={
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
   warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17v.5"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
   search:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
 };
-const VIEWS=[["home","Ana Sayfa"],["subs","Abonelikler"],["offers","Kampanyalar"],["stats","Analiz"]];
+const VIEWS=[["home","Ana Sayfa"],["subs","Abonelikler"],["offers","Kampanyalar"],["stats","Analiz"],["profile","Profil"]];
+const VICON={home:"home",subs:"list",offers:"tag",stats:"chart",profile:"user"};
 const CATS=["Eğlence","Müzik","Verimlilik","Oyun","Bulut","Diğer"];
 const CAT_COLOR={"Eğlence":"--c1","Müzik":"--c2","Verimlilik":"--c3","Oyun":"--c4","Bulut":"--c5","Diğer":"--c6"};
 const CARDS=["Bilmiyorum / diğer","Bonus","Maximum","World","Axess","Paraf","Bankkart","CardFinans","Papara","Papel","Enpara","ON","Tosla"];
@@ -222,9 +239,21 @@ function sample(){return [
   {id:"s8",name:"iCloud+ 50 GB",price:40,cycle:"m",next:plus(19),cat:"Bulut",card:"Bonus",trial:false},
   {id:"s7",name:"Xbox Game Pass",price:1980,cycle:"y",next:plus(95),cat:"Oyun",card:"Bonus",trial:false}
 ]}
-let state={subs:sample(),isSample:true,view:"home",q:"",filter:"Tümü",statMode:"cat",myCards:["Bonus","Maximum"],young:true,joined:{},saved:{}};
-try{const raw=localStorage.getItem(KEY);if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;}}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved}))}catch(e){}}
+// Hesaplar: şimdilik bu cihazda saklanır (parolalar PBKDF2 ile özetlenir, düz metin tutulmaz).
+const ACC="abonelik-cuzdani-hesap",GUEST="~misafir";
+let acc={users:{},current:null};
+try{const a=JSON.parse(localStorage.getItem(ACC)||"null");if(a&&a.users&&typeof a.users==="object")acc=a}catch(e){}
+function saveAcc(){try{localStorage.setItem(ACC,JSON.stringify(acc))}catch(e){}}
+const isGuest=()=>acc.current===GUEST;
+const me=()=>acc.current&&!isGuest()?acc.users[acc.current]:null;
+const dataKey=u=>(u===undefined?acc.current:u)&&(u===undefined?acc.current:u)!==GUEST?KEY+":"+(u===undefined?acc.current:u):KEY;
+let state;
+function loadData(){
+state={subs:isGuest()||!acc.current?sample():[],isSample:isGuest()||!acc.current,view:state&&state.view||"home",q:"",filter:"Tümü",statMode:"cat",myCards:isGuest()?["Bonus","Maximum"]:[],young:isGuest(),joined:{},saved:{}};
+try{const raw=localStorage.getItem(dataKey());if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;}}catch(e){}
+}
+loadData();
+function save(){try{localStorage.setItem(dataKey(),JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved}))}catch(e){}}
 try{const h=location.hash.slice(1);if(VIEWS.some(v=>v[0]===h))state.view=h}catch(e){}
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -444,7 +473,7 @@ function donut(parts,total){
   '<text x="100" y="98" text-anchor="middle" fill="var(--fg)" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22">'+tl(Math.round(total))+' TL</text><text x="100" y="120" text-anchor="middle" fill="var(--muted)" font-size="12">aylık toplam</text></svg>';
 }
 function vStats(){
-  if(!state.subs.length)return '<div class="view"><h1>Analiz</h1>'+emptyState()+dataCard()+'</div>';
+  if(!state.subs.length)return '<div class="view"><h1>Analiz</h1>'+emptyState()+'</div>';
   const total=totalMonthly();
   const parts=CATS.map(k=>({k,v:state.subs.filter(s=>s.cat===k).reduce((a,s)=>a+monthly(s),0)})).filter(p=>p.v>0).sort((a,b)=>b.v-a.v);
   const subs=[...state.subs].sort((a,b)=>monthly(b)-monthly(a));
@@ -475,7 +504,7 @@ function vStats(){
    '<div class="tile"><span class="lbl">En çok harcanan kategori</span><span class="val">'+parts[0].k+' · %'+Math.round(parts[0].v/total*100)+'</span></div>'+
    '<div class="tile"><span class="lbl">Yıllık toplam</span><span class="val num">'+tl(Math.round(total*12))+' TL</span></div>'+
    '<div class="tile"><span class="lbl">Yıllık ödenenler</span><span class="val">'+yearlyOnes.length+' abonelik</span></div>'+
-  '</div></section>'+dataCard()+'</div>';
+  '</div></section></div>';
 }
 function dataCard(){return '<section class="card"><h2>Verilerim</h2><p class="sub" style="font-size:13px;margin:6px 0 12px">Aboneliklerin sadece bu cihazda saklanır. Başka bir telefona ya da tarayıcıya taşımak için yedek kodunu kopyala, diğer cihazda içe aktar.</p><div class="two"><button class="btn btn-g" type="button" data-act="export">Yedek kodu al</button><button class="btn btn-g" type="button" data-act="import">İçe aktar</button></div></section>'}
 function dataSheet(mode){
@@ -483,7 +512,7 @@ function dataSheet(mode){
   const code=exp?JSON.stringify({v:2,subs:state.subs,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved}):"";
   root.innerHTML='<div class="scrim" data-close><form class="sheet" id="df" role="dialog" aria-modal="true" aria-labelledby="dh">'+
   '<div class="row"><h2 id="dh">'+(exp?"Yedek kodu":"İçe aktar")+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+
-  '<p class="sub" style="font-size:13px">'+(exp?"Bu kodu kopyala ve diğer cihazda Analiz > Verilerim > İçe aktar bölümüne yapıştır.":"Diğer cihazdan aldığın yedek kodunu yapıştır. Bu cihazdaki liste onunla değiştirilir.")+'</p>'+
+  '<p class="sub" style="font-size:13px">'+(exp?"Bu kodu kopyala ve diğer cihazda Profil > Verilerim > İçe aktar bölümüne yapıştır.":"Diğer cihazdan aldığın yedek kodunu yapıştır. Bu cihazdaki liste onunla değiştirilir.")+'</p>'+
   '<div class="field"><label for="d-code">Yedek kodu</label><textarea id="d-code"'+(exp?' readonly':'')+' spellcheck="false">'+esc(code)+'</textarea></div>'+
   '<p class="err" id="d-err" hidden></p>'+
   '<button class="btn btn-p" type="submit">'+(exp?"Kopyala":"Yükle")+'</button></form></div>';
@@ -505,14 +534,114 @@ function dataSheet(mode){
     }catch(_){err.textContent="Bu kod okunamadı. Yedek kodunun tamamını yapıştırdığından emin ol.";err.hidden=false}
   });
 }
+
+const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toLocaleUpperCase("tr-TR")||"?";
+function vProfile(){
+  const u=me(),total=totalMonthly(),cards=state.myCards;
+  const head=u?'<div class="prof"><span class="avatar" aria-hidden="true">'+esc(initials(u.name))+'</span><div style="min-width:0"><h2 style="margin:0">'+esc(u.name)+'</h2><p class="sub" style="margin:2px 0 0">@'+esc(acc.current)+' · '+trDate(u.created)+' tarihinden beri üye</p></div></div>':
+   '<div class="prof"><span class="avatar" aria-hidden="true">?</span><div><h2 style="margin:0">Misafir</h2><p class="sub" style="margin:2px 0 0">Hesap açmadan kullanıyorsun.</p></div></div><button class="btn btn-p" type="button" data-act="toRegister">Hesap oluştur</button><p class="mt" style="margin:0">Hesap açarsan bu cihazdaki aboneliklerin hesabına taşınır.</p>';
+  return '<div class="view"><div><h1>Profil</h1><p class="sub">Hesabın, kartların ve verilerin.</p></div>'+
+  '<section class="card" style="display:flex;flex-direction:column;gap:12px">'+head+'</section>'+
+  '<section class="card"><h2>Özetin</h2><div class="tiles" style="margin-top:12px">'+
+   '<div class="tile"><span class="lbl">Abonelik</span><span class="val num">'+state.subs.length+'</span></div>'+
+   '<div class="tile"><span class="lbl">Aylık toplam</span><span class="val num">'+tl(Math.round(total))+' TL</span></div>'+
+   '<div class="tile"><span class="lbl">Bu yıl kazandığın</span><span class="val num" style="color:var(--good)">'+tl(savedYear())+' TL</span></div>'+
+  '</div></section>'+
+  '<section class="card"><div class="row"><h2>Kartlarım</h2><button class="link" type="button" data-go="offers">Düzenle</button></div><p class="sub" style="font-size:14px;margin:8px 0 0">'+(cards.length?esc(cards.join(", ")):"Henüz kart seçmedin.")+(state.young?' · 18–26 yaş kampanyaları açık':'')+'</p></section>'+
+  dataCard()+
+  (u?'<section class="card acts"><h2>Hesap</h2><button class="btn btn-g" type="button" data-act="editName">Adını değiştir</button><button class="btn btn-g" type="button" data-act="changePw">Parolayı değiştir</button><button class="btn btn-g" type="button" data-act="logout">Çıkış yap</button><div id="delAcc"><button class="btn btn-d" type="button" data-act="delAcc" style="width:100%;text-align:left">Hesabı sil</button></div></section>':
+   '<section class="card acts"><h2>Hesap</h2><button class="btn btn-g" type="button" data-act="toLogin">Giriş yap</button></section>')+
+  '<p class="mt" style="text-align:center">Hesabın şimdilik sadece bu cihazda saklanır.</p></div>';
+}
+const enc=t=>new TextEncoder().encode(t);
+const hex=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,"0")).join("");
+async function hashPw(pw,salt){
+  const k=await crypto.subtle.importKey("raw",enc(pw),"PBKDF2",false,["deriveBits"]);
+  return hex(await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc(salt),iterations:150000,hash:"SHA-256"},k,256));
+}
+const newSalt=()=>hex(crypto.getRandomValues(new Uint8Array(16)));
+const normUser=u=>String(u||"").trim().toLocaleLowerCase("tr-TR");
+const pwField=(id,label,ac)=>'<div class="field"><label for="'+id+'">'+label+'</label><div class="pw"><input id="'+id+'" type="password" autocomplete="'+ac+'" required><button type="button" data-show="'+id+'">Göster</button></div></div>';
+let authMode="login";
+function hasGuestData(){try{const p=JSON.parse(localStorage.getItem(KEY)||"null");return !!(p&&Array.isArray(p.subs)&&p.subs.length&&!p.isSample)}catch(e){return false}}
+function renderAuth(){
+  document.body.classList.add("locked");
+  const reg=authMode==="register",root=document.getElementById("authRoot");
+  root.innerHTML='<div class="auth"><form class="card auth-box" id="af" novalidate>'+
+  '<div class="brand"><i>₺</i>Abonelik Cüzdanı</div>'+
+  '<div class="auth-tabs" role="group" aria-label="Giriş veya kayıt"><button type="button" data-mode="login" aria-pressed="'+!reg+'">Giriş yap</button><button type="button" data-mode="register" aria-pressed="'+reg+'">Kayıt ol</button></div>'+
+  (reg?'<div class="field"><label for="a-name">Ad Soyad</label><input id="a-name" autocomplete="name" required maxlength="40" placeholder="Örn: Ayşe Yılmaz"></div>':'')+
+  '<div class="field"><label for="a-user">Kullanıcı adı</label><input id="a-user" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="20"'+(reg?' placeholder="harf, rakam, nokta, alt çizgi"':'')+'></div>'+
+  pwField("a-pw","Parola",reg?"new-password":"current-password")+
+  (reg?pwField("a-pw2","Parola (tekrar)","new-password")+'<p class="mt" style="margin:-6px 0 0">En az 8 karakter.</p>'+
+    (hasGuestData()?'<label class="chk"><input id="a-move" type="checkbox" checked> Bu cihazdaki aboneliklerimi hesabıma taşı</label>':''):'')+
+  '<p class="err" id="a-err" role="alert" hidden></p>'+
+  '<button class="btn btn-p" type="submit" id="a-go">'+(reg?"Hesap oluştur":"Giriş yap")+'</button>'+
+  '<button class="link" type="button" data-mode="'+(reg?"login":"register")+'">'+(reg?"Zaten hesabın var mı? Giriş yap":"Hesabın yok mu? Kayıt ol")+'</button>'+
+  '<button class="link" type="button" data-guest>Hesap açmadan dene</button>'+
+  '<p class="note">Hesabın şimdilik bu cihazda saklanır, parolan şifrelenmiş olarak tutulur.</p>'+
+  '</form></div>';
+  const f=document.getElementById("af"),err=document.getElementById("a-err"),go=document.getElementById("a-go");
+  const fail=t=>{err.textContent=t;err.hidden=false;go.disabled=false};
+  f.addEventListener("click",e=>{
+    const m=e.target.closest("[data-mode]");if(m){authMode=m.dataset.mode;renderAuth();return}
+    const sh=e.target.closest("[data-show]");if(sh){const i=document.getElementById(sh.dataset.show);i.type=i.type==="password"?"text":"password";sh.textContent=i.type==="password"?"Göster":"Gizle";return}
+    if(e.target.closest("[data-guest]")){acc.current=GUEST;saveAcc();enterApp()}
+  });
+  setTimeout(()=>{const i=document.getElementById(reg?"a-name":"a-user");if(i)i.focus()},0);
+  f.addEventListener("submit",async e=>{e.preventDefault();err.hidden=true;go.disabled=true;
+    if(!(window.crypto&&crypto.subtle))return fail("Bu tarayıcı güvenli parola saklamayı desteklemiyor.");
+    const user=normUser(document.getElementById("a-user").value),pw=document.getElementById("a-pw").value;
+    try{
+    if(reg){
+      const name=document.getElementById("a-name").value.trim(),pw2=document.getElementById("a-pw2").value;
+      if(!name)return fail("Adını yaz.");
+      if(!/^[a-z0-9._]{3,20}$/.test(user))return fail("Kullanıcı adı 3–20 karakter olmalı; sadece harf (Türkçe karakter hariç), rakam, nokta ve alt çizgi.");
+      if(acc.users[user])return fail("Bu kullanıcı adı alınmış.");
+      if(pw.length<8)return fail("Parola en az 8 karakter olmalı.");
+      if(pw!==pw2)return fail("Parolalar aynı değil.");
+      const salt=newSalt(),hash=await hashPw(pw,salt);
+      acc.users[user]={name:name.slice(0,40),salt,hash,created:iso(new Date())};
+      const mv=document.getElementById("a-move");
+      if(mv&&mv.checked){try{localStorage.setItem(dataKey(user),localStorage.getItem(KEY));localStorage.removeItem(KEY)}catch(_){}}
+      acc.current=user;saveAcc();enterApp();
+    }else{
+      const u=acc.users[user];
+      if(!u||await hashPw(pw,u.salt)!==u.hash)return fail("Kullanıcı adı veya parola hatalı.");
+      acc.current=user;saveAcc();enterApp();
+    }}catch(_){fail("Bir sorun oldu, tekrar dene.")}
+  });
+}
+function enterApp(){document.getElementById("authRoot").innerHTML="";document.body.classList.remove("locked");loadData();if(FEED.campaigns.length)logSavings();render();window.scrollTo(0,0)}
+function logout(){acc.current=null;saveAcc();authMode="login";state.view="home";try{history.replaceState(null,"","#")}catch(_){}render()}
+function accSheet(mode){
+  const root=document.getElementById("sheetRoot"),u=me(),pwm=mode==="pw";
+  root.innerHTML='<div class="scrim" data-close><form class="sheet" id="pf" role="dialog" aria-modal="true" aria-labelledby="ph">'+
+  '<div class="row"><h2 id="ph">'+(pwm?"Parolayı değiştir":"Adını değiştir")+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+
+  (pwm?pwField("p-old","Mevcut parola","current-password")+pwField("p-new","Yeni parola","new-password")+pwField("p-new2","Yeni parola (tekrar)","new-password"):
+   '<div class="field"><label for="p-name">Ad Soyad</label><input id="p-name" required maxlength="40" value="'+esc(u.name)+'"></div>')+
+  '<p class="err" id="p-err" role="alert" hidden></p><button class="btn btn-p" type="submit">Kaydet</button></form></div>';
+  const err=document.getElementById("p-err"),fail=t=>{err.textContent=t;err.hidden=false};
+  root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.matches("[data-close]"))root.innerHTML="";const sh=e.target.closest("[data-show]");if(sh){const i=document.getElementById(sh.dataset.show);i.type=i.type==="password"?"text":"password";sh.textContent=i.type==="password"?"Göster":"Gizle"}});
+  setTimeout(()=>document.getElementById(pwm?"p-old":"p-name").focus(),0);
+  document.getElementById("pf").addEventListener("submit",async e=>{e.preventDefault();
+    if(!pwm){const n=document.getElementById("p-name").value.trim();if(!n)return fail("Adını yaz.");u.name=n.slice(0,40);saveAcc();root.innerHTML="";render();return}
+    const o=document.getElementById("p-old").value,n=document.getElementById("p-new").value,n2=document.getElementById("p-new2").value;
+    if(await hashPw(o,u.salt)!==u.hash)return fail("Mevcut parola hatalı.");
+    if(n.length<8)return fail("Yeni parola en az 8 karakter olmalı.");
+    if(n!==n2)return fail("Yeni parolalar aynı değil.");
+    u.salt=newSalt();u.hash=await hashPw(n,u.salt);saveAcc();root.innerHTML="";render();
+  });
+}
 function render(){
-  const navHtml=VIEWS.map(([k,l])=>'<button class="nav-btn" type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[{home:"home",subs:"list",offers:"tag",stats:"chart"}[k]]+l+'</button>').join("");
+  if(!acc.current){renderAuth();return}
+  const navHtml=VIEWS.map(([k,l])=>'<button class="nav-btn" type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[VICON[k]]+l+'</button>').join("");
   document.getElementById("railNav").innerHTML=navHtml;
-  const tb=VIEWS.map(([k,l])=>'<button type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[{home:"home",subs:"list",offers:"tag",stats:"chart"}[k]]+l+'</button>');
+  const tb=VIEWS.map(([k,l])=>'<button type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[VICON[k]]+l+'</button>');
   tb.splice(2,0,'<button class="fab" type="button" data-act="add" aria-label="Abonelik ekle">'+ICONS.plus+'</button>');
   document.getElementById("tabbar").innerHTML=tb.join("");
   const m=document.getElementById("main");
-  m.innerHTML=({home:vHome,subs:vSubs,offers:vOffers,stats:vStats})[state.view]();
+  m.innerHTML=({home:vHome,subs:vSubs,offers:vOffers,stats:vStats,profile:vProfile})[state.view]();
   const q=document.getElementById("q");
   if(q)q.addEventListener("input",e=>{state.q=e.target.value;const pos=e.target.selectionStart;render();const n=document.getElementById("q");n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}});
 }
@@ -575,6 +704,13 @@ document.addEventListener("click",e=>{
   else if(t.dataset.joined){state.joined[t.dataset.joined]=true;save();render()}
   else if(t.dataset.act==="add")openSheet(null);
   else if(t.dataset.act==="export"||t.dataset.act==="import")dataSheet(t.dataset.act);
+  else if(t.dataset.act==="logout")logout();
+  else if(t.dataset.act==="toRegister"||t.dataset.act==="toLogin"){authMode=t.dataset.act==="toRegister"?"register":"login";acc.current=null;saveAcc();render()}
+  else if(t.dataset.act==="editName")accSheet("name");
+  else if(t.dataset.act==="changePw")accSheet("pw");
+  else if(t.dataset.act==="delAcc"){document.getElementById("delAcc").innerHTML='<p style="margin:0 0 8px;font-weight:600">Hesabın ve tüm abonelik kayıtların bu cihazdan silinsin mi?</p><div class="two"><button class="btn btn-g" type="button" data-act="noDelAcc">Vazgeç</button><button class="btn btn-d" type="button" data-act="yesDelAcc">Evet, sil</button></div>'}
+  else if(t.dataset.act==="noDelAcc")render();
+  else if(t.dataset.act==="yesDelAcc"){try{localStorage.removeItem(dataKey())}catch(_){}delete acc.users[acc.current];logout()}
   else if(t.dataset.act==="clear"){state.subs=[];state.isSample=false;save();render()}
 });
 document.addEventListener("change",e=>{if(e.target.id==="young"){state.young=e.target.checked;save();render()}});
