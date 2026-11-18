@@ -187,6 +187,21 @@ body.locked .shell,body.locked .tabbar{display:none!important}
 .avatar{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px;flex:none}
 .acts{display:flex;flex-direction:column;gap:8px}
 .acts .btn{text-align:left}
+.cal-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cal-h h1{font-size:34px}
+.cal-nav{display:flex;gap:8px}
+.cal-nav button{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:18px;font-weight:700}
+.cal-sum{display:flex;gap:22px;flex-wrap:wrap;font-size:17px;margin-top:6px}
+.cal-sum b{font-weight:800;font-variant-numeric:tabular-nums}.cal-sum span{color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .wd{text-align:center;font-size:12px;font-weight:700;color:var(--muted);padding-bottom:2px}
+.cal .d{min-height:66px;min-width:0;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 2px;color:var(--fg);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.cal .d.today{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.cal .d[aria-pressed="true"]{box-shadow:0 0 0 2px var(--accent)}
+.cal .d .ic{display:flex;flex-direction:column;align-items:center;gap:3px}
+.cal .more{font-size:10px;color:var(--muted);font-weight:700}
+.legal h3{font-size:15px;margin:14px 0 4px}.legal p,.legal li{font-size:13.5px;line-height:1.55;margin:4px 0}.legal ul{padding-left:18px;margin:4px 0}
+.legal .draft{background:var(--accent-soft);border-radius:10px;padding:8px 10px;font-size:12.5px}
 @media (prefers-reduced-motion:no-preference){.view{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
 </style>
 
@@ -218,8 +233,9 @@ const ICONS={
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
   search:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
 };
-const VIEWS=[["home","Ana Sayfa"],["subs","Abonelikler"],["offers","Kampanyalar"],["stats","Analiz"],["profile","Profil"]];
-const VICON={home:"home",subs:"list",offers:"tag",stats:"chart",profile:"user"};
+const VIEWS=[["home","Ana Sayfa"],["subs","Abonelikler"],["cal","Takvim"],["offers","Kampanyalar"],["stats","Analiz"],["profile","Profil"]];
+const VICON={home:"home",subs:"list",cal:"cal",offers:"tag",stats:"chart",profile:"user"};
+const TABS=["home","subs","cal","offers","profile"];
 const CATS=["Eğlence","Müzik","Verimlilik","Oyun","Bulut","Diğer"];
 const CAT_COLOR={"Eğlence":"--c1","Müzik":"--c2","Verimlilik":"--c3","Oyun":"--c4","Bulut":"--c5","Diğer":"--c6"};
 const CARDS=["Bilmiyorum / diğer","Bonus","Maximum","World","Axess","Paraf","Bankkart","CardFinans","Papara","Papel","Enpara","ON","Tosla"];
@@ -535,6 +551,49 @@ function dataSheet(mode){
   });
 }
 
+let calM=null,calSel=null;
+const tl2=n=>new Intl.NumberFormat("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+function occ(s,y,m){const d=new Date(s.next+"T00:00:00");if(isNaN(d))return null;if(s.cycle==="y"&&d.getMonth()!==m)return null;return Math.min(d.getDate(),new Date(y,m+1,0).getDate())}
+function vCal(){
+  if(!calM)calM={y:today.getFullYear(),m:today.getMonth()};
+  const {y,m}=calM,dim=new Date(y,m+1,0).getDate(),first=(new Date(y,m,1).getDay()+6)%7,by={};let tot=0,up=0;
+  state.subs.forEach(s=>{const d=occ(s,y,m);if(d==null)return;(by[d]=by[d]||[]).push(s);tot+=s.price;if(new Date(y,m,d)>=today)up+=s.price});
+  let mn=new Date(y,m,1).toLocaleDateString("tr-TR",{month:"long"});mn=mn.charAt(0).toLocaleUpperCase("tr-TR")+mn.slice(1);
+  const isNow=y===today.getFullYear()&&m===today.getMonth();
+  let cells=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"].map(w=>'<div class="wd">'+w+'</div>').join("")+'<div></div>'.repeat(first);
+  for(let d=1;d<=dim;d++){const L=by[d]||[],t=isNow&&d===today.getDate();
+    cells+='<button type="button" class="d'+(t?' today':'')+'" data-day="'+d+'" aria-pressed="'+(calSel===d)+'" aria-label="'+d+' '+mn+(L.length?', '+L.length+' ödeme':'')+'"'+(t?' aria-current="date"':'')+'>'+d+
+    (L.length?'<span class="ic">'+badge(L[0].name,true)+(L.length>1?'<span class="more">+'+(L.length-1)+'</span>':'')+'</span>':'')+'</button>'}
+  const days=Object.keys(by).map(Number).sort((a,b)=>a-b).filter(d=>calSel==null||d===calSel);
+  const rows=days.flatMap(d=>by[d].map(s=>'<button class="item" type="button" data-edit="'+s.id+'">'+logo(s)+'<span><span class="nm">'+esc(s.name)+'</span><br><span class="mt">'+d+' '+mn+(s.cycle==="y"?' · yıllık':'')+'</span></span><b class="num">₺'+tl2(s.price)+'</b></button>'));
+  return '<div class="view"><div><div class="cal-h"><h1>'+mn+(y!==today.getFullYear()?' '+y:'')+'</h1><div class="cal-nav"><button type="button" data-calm="-1" aria-label="Önceki ay">‹</button>'+(isNow?'':'<button type="button" data-calm="0" aria-label="Bu aya dön" style="width:auto;padding:0 12px;font-size:13px">Bugün</button>')+'<button type="button" data-calm="1" aria-label="Sonraki ay">›</button></div></div>'+
+  '<div class="cal-sum"><div><b>₺'+tl2(tot)+'</b> <span>Toplam</span></div><div><b>₺'+tl2(up)+'</b> <span>Yaklaşan</span></div></div></div>'+
+  '<div class="cal">'+cells+'</div>'+
+  '<section class="card"><div class="row"><h2>'+(calSel?calSel+' '+mn+' ödemeleri':mn+' ödemeleri')+'</h2>'+(calSel?'<button class="link" type="button" data-day="0">Tüm ay</button>':'')+'</div>'+
+  (rows.length?'<div class="list">'+rows.join("")+'</div>':'<p class="sub" style="margin:8px 0 0">'+(calSel?'Bu günde ödeme yok.':'Bu ay ödeme yok.')+'</p>')+'</section></div>';
+}
+const LEGAL={
+kvkk:'<div class="legal"><p class="draft">Taslak metindir; yayından önce hukuken kontrol edilecektir.</p>'+
+'<p>Abonelik Cüzdanı olarak kişisel verilerini 6698 sayılı Kişisel Verilerin Korunması Kanunu’na (KVKK) uygun işliyoruz. Bu metin hangi verini neden işlediğimizi ve haklarını anlatır.</p>'+
+'<h3>Veri sorumlusu</h3><p>AGN Sanayi ve Ticaret Ltd. Şti. · Adres: [eklenecek] · E-posta: [eklenecek]</p>'+
+'<h3>İşlediğimiz veriler</h3><ul><li><b>Hesap bilgileri:</b> adın soyadın, kullanıcı adın ve parolan. Parolan düz metin olarak değil, geri çevrilemez şekilde şifrelenerek tutulur.</li><li><b>Abonelik bilgileri:</b> abonelik adı, ücreti, ödeme günü, kategorisi ve hangi kartla ödediğin.</li><li><b>Tercihler:</b> sahip olduğun kart programları (ör. Bonus, Maximum), 18–26 yaş tercihi, kampanya ve iade kayıtların.</li><li><b>Teknik veriler:</b> uygulama dosyaları indirilirken barındırma hizmetinin otomatik tuttuğu IP adresi ve tarayıcı bilgisi.</li></ul>'+
+'<p>Kart numarası, kart şifresi ya da banka hesap bilgisi istemiyoruz. Banka hesabına veya kartına bağlanmıyoruz.</p>'+
+'<h3>Veriler nerede saklanıyor</h3><p>Hesap ve abonelik bilgilerin şu anda yalnızca kendi cihazında, tarayıcının depolama alanında saklanır; bizim sunucularımıza gönderilmez. Uygulama dosyaları GitHub Pages (GitHub Inc., ABD) üzerinden sunulur.</p>'+
+'<h3>Amaçlar ve hukuki sebepler</h3><ul><li>Aboneliklerini listelemek, ödeme günlerini ve sana uyan kampanyaları göstermek: sözleşmenin kurulması ve ifası (KVKK m.5/2-c).</li><li>Hizmetin güvenliği ve geliştirilmesi: meşru menfaat (m.5/2-f).</li><li>Resmi makamların talepleri: kanuni yükümlülük (m.5/2-ç).</li><li>Tanıtım bildirimi göndermek: yalnızca ayrıca onay verirsen, açık rıza (m.5/1).</li></ul>'+
+'<h3>Aktarım</h3><p>Verilerini satmıyor ve reklam amaçlı paylaşmıyoruz.</p>'+
+'<h3>Saklama süresi</h3><p>Veriler sen silene kadar cihazında kalır. Profil &gt; Hesabı sil ile hesabını ve kayıtlarını istediğin an silebilirsin.</p>'+
+'<h3>Hakların (KVKK m.11)</h3><p>Verilerinin işlenip işlenmediğini öğrenme, bilgi isteme, amaca uygun kullanılıp kullanılmadığını öğrenme, aktarıldığı kişileri bilme, düzeltilmesini veya silinmesini isteme, itiraz etme ve zararın giderilmesini isteme hakların vardır. Taleplerini [e-posta eklenecek] adresine yazabilirsin; en geç 30 gün içinde ücretsiz yanıtlarız.</p></div>',
+terms:'<div class="legal"><p class="draft">Taslak metindir; yayından önce hukuken kontrol edilecektir.</p>'+
+'<h3>Hizmet</h3><p>Abonelik Cüzdanı, aboneliklerini kendin girerek takip etmeni, ödeme günlerini görmeni ve uyan banka ve cüzdan kampanyalarını bulmanı sağlayan ücretsiz bir araçtır. Banka hesabına veya kartına bağlanmaz, ödeme yapmaz ve abonelik iptal etmez.</p>'+
+'<h3>Kampanya ve fiyat bilgileri</h3><p>Bilgiler bankaların ve platformların herkese açık sayfalarından derlenir, bilgilendirme amaçlıdır ve teklif değildir. Kampanya koşullarını bankalar belirler ve değiştirebilir; katılmadan önce bankanın kendi sayfasından kontrol etmelisin. Bilgilerin eksiksiz ve güncel olduğunu garanti etmeyiz.</p>'+
+'<h3>Senin sorumluluğun</h3><p>Girdiğin bilgilerin doğruluğundan sen sorumlusun. Kart numarası, şifre ya da başkasına ait kişisel veri girmemelisin.</p>'+
+'<h3>Markalar</h3><p>Adı geçen banka, kart programı ve platform adları sahiplerine aittir ve yalnızca kampanyayı tanımlamak için kullanılır. Abonelik Cüzdanı bu kuruluşların resmi ürünü değildir.</p>'+
+'<h3>Uygulanacak hukuk</h3><p>Bu koşullara Türkiye Cumhuriyeti hukuku uygulanır.</p></div>'};
+function legalSheet(k){
+  const root=document.getElementById("sheetRoot");
+  root.innerHTML='<div class="scrim" data-close><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="lh"><div class="row"><h2 id="lh">'+(k==="kvkk"?"KVKK Aydınlatma Metni":"Kullanım Koşulları")+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+LEGAL[k]+'<button class="btn btn-p" type="button" data-close>Anladım</button></div></div>';
+  root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.matches("[data-close]"))root.innerHTML=""});
+}
 const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toLocaleUpperCase("tr-TR")||"?";
 function vProfile(){
   const u=me(),total=totalMonthly(),cards=state.myCards;
@@ -548,6 +607,7 @@ function vProfile(){
    '<div class="tile"><span class="lbl">Bu yıl kazandığın</span><span class="val num" style="color:var(--good)">'+tl(savedYear())+' TL</span></div>'+
   '</div></section>'+
   '<section class="card"><div class="row"><h2>Kartlarım</h2><button class="link" type="button" data-go="offers">Düzenle</button></div><p class="sub" style="font-size:14px;margin:8px 0 0">'+(cards.length?esc(cards.join(", ")):"Henüz kart seçmedin.")+(state.young?' · 18–26 yaş kampanyaları açık':'')+'</p></section>'+
+  '<section class="card acts"><h2>Daha fazla</h2><button class="btn btn-g" type="button" data-go="stats">Analiz ve tasarruf sayacı</button><button class="btn btn-g" type="button" data-legal="kvkk">KVKK Aydınlatma Metni</button><button class="btn btn-g" type="button" data-legal="terms">Kullanım Koşulları</button></section>'+
   dataCard()+
   (u?'<section class="card acts"><h2>Hesap</h2><button class="btn btn-g" type="button" data-act="editName">Adını değiştir</button><button class="btn btn-g" type="button" data-act="changePw">Parolayı değiştir</button><button class="btn btn-g" type="button" data-act="logout">Çıkış yap</button><div id="delAcc"><button class="btn btn-d" type="button" data-act="delAcc" style="width:100%;text-align:left">Hesabı sil</button></div></section>':
    '<section class="card acts"><h2>Hesap</h2><button class="btn btn-g" type="button" data-act="toLogin">Giriş yap</button></section>')+
@@ -574,18 +634,20 @@ function renderAuth(){
   '<div class="field"><label for="a-user">Kullanıcı adı</label><input id="a-user" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="20"'+(reg?' placeholder="harf, rakam, nokta, alt çizgi"':'')+'></div>'+
   pwField("a-pw","Parola",reg?"new-password":"current-password")+
   (reg?pwField("a-pw2","Parola (tekrar)","new-password")+'<p class="mt" style="margin:-6px 0 0">En az 8 karakter.</p>'+
-    (hasGuestData()?'<label class="chk"><input id="a-move" type="checkbox" checked> Bu cihazdaki aboneliklerimi hesabıma taşı</label>':''):'')+
+    (hasGuestData()?'<label class="chk"><input id="a-move" type="checkbox" checked> Bu cihazdaki aboneliklerimi hesabıma taşı</label>':'')+
+    '<label class="chk" style="align-items:flex-start;font-weight:500"><input id="a-kvkk" type="checkbox" style="margin-top:2px"> <span><button class="link" type="button" data-legal="kvkk" style="font-size:14px">Aydınlatma Metni</button>’ni okudum, <button class="link" type="button" data-legal="terms" style="font-size:14px">Kullanım Koşulları</button>’nı kabul ediyorum.</span></label>':'')+
   '<p class="err" id="a-err" role="alert" hidden></p>'+
   '<button class="btn btn-p" type="submit" id="a-go">'+(reg?"Hesap oluştur":"Giriş yap")+'</button>'+
   '<button class="link" type="button" data-mode="'+(reg?"login":"register")+'">'+(reg?"Zaten hesabın var mı? Giriş yap":"Hesabın yok mu? Kayıt ol")+'</button>'+
   '<button class="link" type="button" data-guest>Hesap açmadan dene</button>'+
-  '<p class="note">Hesabın şimdilik bu cihazda saklanır, parolan şifrelenmiş olarak tutulur.</p>'+
+  '<p class="mt" style="text-align:center;margin:0;font-size:12px">Hesabın şimdilik bu cihazda saklanır, parolan şifrelenmiş olarak tutulur. <button class="link" type="button" data-legal="kvkk" style="font-size:12px;display:inline">Aydınlatma Metni</button></p>'+
   '</form></div>';
   const f=document.getElementById("af"),err=document.getElementById("a-err"),go=document.getElementById("a-go");
   const fail=t=>{err.textContent=t;err.hidden=false;go.disabled=false};
   f.addEventListener("click",e=>{
     const m=e.target.closest("[data-mode]");if(m){authMode=m.dataset.mode;renderAuth();return}
     const sh=e.target.closest("[data-show]");if(sh){const i=document.getElementById(sh.dataset.show);i.type=i.type==="password"?"text":"password";sh.textContent=i.type==="password"?"Göster":"Gizle";return}
+    const lg=e.target.closest("[data-legal]");if(lg){legalSheet(lg.dataset.legal);return}
     if(e.target.closest("[data-guest]")){acc.current=GUEST;saveAcc();enterApp()}
   });
   setTimeout(()=>{const i=document.getElementById(reg?"a-name":"a-user");if(i)i.focus()},0);
@@ -600,8 +662,9 @@ function renderAuth(){
       if(acc.users[user])return fail("Bu kullanıcı adı alınmış.");
       if(pw.length<8)return fail("Parola en az 8 karakter olmalı.");
       if(pw!==pw2)return fail("Parolalar aynı değil.");
+      if(!document.getElementById("a-kvkk").checked)return fail("Devam etmek için Aydınlatma Metni’ni okuduğunu onayla.");
       const salt=newSalt(),hash=await hashPw(pw,salt);
-      acc.users[user]={name:name.slice(0,40),salt,hash,created:iso(new Date())};
+      acc.users[user]={name:name.slice(0,40),salt,hash,created:iso(new Date()),kvkk:{v:"taslak-2026-11",at:new Date().toISOString()}};
       const mv=document.getElementById("a-move");
       if(mv&&mv.checked){try{localStorage.setItem(dataKey(user),localStorage.getItem(KEY));localStorage.removeItem(KEY)}catch(_){}}
       acc.current=user;saveAcc();enterApp();
@@ -637,11 +700,11 @@ function render(){
   if(!acc.current){renderAuth();return}
   const navHtml=VIEWS.map(([k,l])=>'<button class="nav-btn" type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[VICON[k]]+l+'</button>').join("");
   document.getElementById("railNav").innerHTML=navHtml;
-  const tb=VIEWS.map(([k,l])=>'<button type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[VICON[k]]+l+'</button>');
+  const tb=VIEWS.filter(([k])=>TABS.includes(k)).map(([k,l])=>'<button type="button" data-go="'+k+'"'+(state.view===k?' aria-current="page"':'')+'>'+ICONS[VICON[k]]+l+'</button>');
   tb.splice(2,0,'<button class="fab" type="button" data-act="add" aria-label="Abonelik ekle">'+ICONS.plus+'</button>');
   document.getElementById("tabbar").innerHTML=tb.join("");
   const m=document.getElementById("main");
-  m.innerHTML=({home:vHome,subs:vSubs,offers:vOffers,stats:vStats,profile:vProfile})[state.view]();
+  m.innerHTML=({home:vHome,subs:vSubs,cal:vCal,offers:vOffers,stats:vStats,profile:vProfile})[state.view]();
   const q=document.getElementById("q");
   if(q)q.addEventListener("input",e=>{state.q=e.target.value;const pos=e.target.selectionStart;render();const n=document.getElementById("q");n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}});
 }
@@ -694,9 +757,12 @@ function openSheet(id){
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("sheetRoot").innerHTML=""});
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice],[data-sv]"); if(!t||t.closest("#sheetRoot"))return;
+  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice],[data-sv],[data-calm],[data-day],[data-legal]"); if(!t||t.closest("#sheetRoot"))return;
   if(t.dataset.go){state.view=t.dataset.go;try{history.replaceState(null,"","#"+state.view)}catch(_){}render();window.scrollTo(0,0)}
   else if(t.dataset.edit)openSheet(t.dataset.edit);
+  else if(t.dataset.legal)legalSheet(t.dataset.legal);
+  else if(t.dataset.calm!==undefined){const k=+t.dataset.calm;if(!k||!calM)calM={y:today.getFullYear(),m:today.getMonth()};else{const d=new Date(calM.y,calM.m+k,1);calM={y:d.getFullYear(),m:d.getMonth()}}calSel=null;render()}
+  else if(t.dataset.day!==undefined){const d=+t.dataset.day;calSel=d&&calSel!==d?d:null;render()}
   else if(t.dataset.filter){state.filter=t.dataset.filter;render()}
   else if(t.dataset.card){const p=t.dataset.card;state.myCards=state.myCards.includes(p)?state.myCards.filter(x=>x!==p):state.myCards.concat(p);save();render()}
   else if(t.dataset.setprice){const [id,pr]=t.dataset.setprice.split("|");state.subs=state.subs.map(x=>x.id===id?Object.assign({},x,{price:parseFloat(pr)}):x);save();render()}
