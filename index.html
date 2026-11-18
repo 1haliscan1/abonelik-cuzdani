@@ -214,6 +214,12 @@ body.locked .shell,body.locked .tabbar{display:none!important}
 .cmp th{font-size:12px;color:var(--muted);font-weight:700}
 .cmp td.c{text-align:center;width:70px;font-weight:800}
 .cmp .y{color:var(--good)}.cmp .n{color:var(--muted);font-weight:600}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pcard{display:flex;flex-direction:column;gap:4px;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:14px;color:var(--fg)}
+.pcard[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pcard .pl{font-weight:800;font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pcard .pp{font-family:var(--display);font-weight:800;font-size:22px}.pcard .pp small{font-size:12px;color:var(--muted);font-weight:600}
+@media (max-width:360px){.pgrid{grid-template-columns:1fr}}
 .imp-row{display:grid;grid-template-columns:auto 36px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .imp-row input{width:18px;height:18px;accent-color:var(--accent)}
 .imp-row .trunc{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
@@ -282,10 +288,10 @@ const dataKey=u=>(u===undefined?acc.current:u)&&(u===undefined?acc.current:u)!==
 let state;
 function loadData(){
 state={subs:isGuest()||!acc.current?sample():[],isSample:isGuest()||!acc.current,view:state&&state.view||"home",q:"",filter:"Tümü",statMode:"cat",myCards:isGuest()?["Bonus","Maximum"]:[],young:isGuest(),joined:{},saved:{},plan:"free",planSince:null};
-try{const raw=localStorage.getItem(dataKey());if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;if(p.plan==="premium"){state.plan="premium";state.planSince=p.planSince||null}}}catch(e){}
+try{const raw=localStorage.getItem(dataKey());if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;if(p.plan==="premium"){state.plan="premium";state.planSince=p.planSince||null;state.planPeriod=p.planPeriod||null}}}catch(e){}
 }
 loadData();
-function save(){try{localStorage.setItem(dataKey(),JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved,plan:state.plan,planSince:state.planSince}))}catch(e){}}
+function save(){try{localStorage.setItem(dataKey(),JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved,plan:state.plan,planSince:state.planSince,planPeriod:state.planPeriod}))}catch(e){}}
 try{const h=location.hash.slice(1);if(VIEWS.some(v=>v[0]===h)||h==="premium")state.view=h}catch(e){}
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -452,6 +458,29 @@ function feedNote(){
   return '';
 }
 const FREE_LIMIT=5;
+// Ödeme: sunucu tarafı (iyzico) kurulunca checkoutUrl doldurulur; boşken gerçek ödeme alınmaz.
+const PAY={provider:"iyzico",checkoutUrl:""};
+const PRICES={m:{label:"Aylık",price:29.99,per:"ay"},y:{label:"Yıllık",price:249.99,per:"yıl"}};
+let payPick="y";
+const yearlySave=()=>Math.floor((1-PRICES.y.price/(PRICES.m.price*12))*100);
+function priceBox(){
+  const card=k=>{const P=PRICES[k],on=payPick===k;return '<button type="button" class="pcard" data-pick="'+k+'" aria-pressed="'+on+'"><span class="pl">'+P.label+(k==="y"?' <span class="badge-pro">%'+yearlySave()+' indirim</span>':'')+'</span><span class="pp num">₺'+tl2(P.price)+'<small> / '+P.per+'</small></span><span class="mt">'+(k==="y"?'ayda ₺'+tl2(P.price/12)+' · 12 ayı peşin öde':'İstediğin zaman iptal et')+'</span></button>'};
+  const P=PRICES[payPick];
+  return '<section class="card acts"><h2>Planını seç</h2><div class="pgrid">'+card("y")+card("m")+'</div>'+
+  '<label class="chk" style="align-items:flex-start;font-weight:500;font-size:13px"><input id="pay-ok" type="checkbox" style="margin-top:2px"> <span><button class="link" type="button" data-legal="sales">Mesafeli Satış Sözleşmesi</button> ve <button class="link" type="button" data-legal="refund">İptal ve İade Koşulları</button>’nı okudum, kabul ediyorum.</span></label>'+
+  '<p class="err" id="pay-err" role="alert" hidden></p>'+
+  '<button class="btn btn-p" type="button" data-act="pay">Premium’a geç · ₺'+tl2(P.price)+' / '+P.per+'</button>'+
+  '<p class="mt" style="margin:0;text-align:center">Abonelik her '+P.per+' otomatik yenilenir. Profil’den istediğin zaman iptal edebilirsin.</p>'+
+  '<button class="link" type="button" data-act="goPro" style="align-self:center">Ödemeden önce ücretsiz dene</button></section>';
+}
+function paySheet(){
+  const root=document.getElementById("sheetRoot"),P=PRICES[payPick];
+  root.innerHTML='<div class="scrim" data-close><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ph2"><div class="row"><h2 id="ph2">Ödeme henüz açık değil</h2><button class="link" type="button" data-close>Kapat</button></div>'+
+  '<p style="margin:0">Seçtiğin plan: <b>Premium '+P.label+' · ₺'+tl2(P.price)+' / '+P.per+'</b></p>'+
+  '<p class="sub" style="margin:0;font-size:14px">Kartla ödeme altyapısı kurulum aşamasında, şu an kartından para çekilmez. Ödeme açılana kadar Premium’u ücretsiz kullanabilirsin.</p>'+
+  '<button class="btn btn-p" type="button" data-close data-trial>Ücretsiz denemeyi başlat</button></div></div>';
+  root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.closest("[data-trial]")){state.plan="premium";state.planSince=iso(today);state.planPeriod=payPick;save();root.innerHTML="";render();window.scrollTo(0,0);return}if(e.target.matches("[data-close]"))root.innerHTML=""});
+}
 const isPro=()=>state.plan==="premium";
 function lockCard(title,text){return '<section class="card lock"><div class="row"><h2>'+title+' <span class="badge-pro">PREMIUM</span></h2></div><p class="sub" style="margin:0;font-size:14px">'+text+'</p><button class="btn btn-p" type="button" data-go="premium">Premium’u incele</button></section>'}
 const MERCH=[["netflix","Netflix","Eğlence"],["spotify","Spotify","Müzik"],["youtube","YouTube Premium","Eğlence"],["disneyplus","Disney+","Eğlence"],["disney+","Disney+","Eğlence"],["disney","Disney+","Eğlence"],["primevideo","Amazon Prime","Eğlence"],["amazonprime","Amazon Prime","Eğlence"],["exxen","Exxen","Eğlence"],["blutv","BluTV","Eğlence"],["hbomax","HBO Max","Eğlence"],["max.com","HBO Max","Eğlence"],["tabii","tabii","Eğlence"],["mubi","MUBI","Eğlence"],["ssport","S Sport Plus","Eğlence"],["beinconnect","beIN CONNECT","Eğlence"],["todtv","TOD","Eğlence"],["digiturk","Digiturk","Eğlence"],["applemusic","Apple Music","Müzik"],["deezer","Deezer","Müzik"],["fizy","fizy","Müzik"],["storytel","Storytel","Diğer"],["audible","Audible","Diğer"],["icloud","iCloud+","Bulut"],["apple.com/bill","Apple (App Store/iCloud)","Bulut"],["googleone","Google One","Bulut"],["openai","ChatGPT Plus","Verimlilik"],["chatgpt","ChatGPT Plus","Verimlilik"],["anthropic","Claude","Verimlilik"],["claude.ai","Claude","Verimlilik"],["geminiadvanced","Gemini","Verimlilik"],["adobe","Adobe Creative Cloud","Verimlilik"],["canva","Canva","Verimlilik"],["microsoft365","Microsoft 365","Verimlilik"],["notion","Notion","Verimlilik"],["duolingo","Duolingo","Diğer"],["xboxgamepass","Xbox Game Pass","Oyun"],["xbox","Xbox Game Pass","Oyun"],["playstationplus","PlayStation Plus","Oyun"],["psplus","PlayStation Plus","Oyun"],["playstation","PlayStation Plus","Oyun"],["eaplay","EA Play","Oyun"],["macfit","MACFit","Diğer"],["turkcell","Turkcell","Diğer"],["vodafone","Vodafone","Diğer"],["turktelekom","Türk Telekom","Diğer"],["superonline","Superonline","Diğer"]];
@@ -518,8 +547,7 @@ function vPremium(){
   return '<div class="view"><div class="row"><h1>Premium</h1><button class="link" type="button" data-go="profile">‹ Profil</button></div>'+
   '<section class="pro-hero"><small>'+(isPro()?'Premium açık':'Ücretsiz plandasın')+'</small><div class="big">'+head+'</div><p>'+sub+'</p></section>'+
   '<section class="card"><table class="cmp"><thead><tr><th>Özellik</th><th style="text-align:center">Ücretsiz</th><th style="text-align:center">Premium</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td>'+r[1]+r[2]+'</tr>').join("")+'</tbody></table></section>'+
-  (isPro()?'<section class="card acts"><p style="margin:0;font-weight:700">Premium deneme sürümün açık'+(state.planSince?' ('+trDate(state.planSince)+' tarihinden beri)':'')+'.</p><button class="btn btn-g" type="button" data-act="stmt">Ekstreden abonelik bul</button><button class="btn btn-g" type="button" data-act="toFree">Ücretsiz plana dön</button></section>':
-   '<section class="card acts"><p style="margin:0;font-weight:700">Fiyat yakında açıklanacak.</p><p class="sub" style="margin:0;font-size:13px">Ödeme altyapısı henüz kurulmadı. Bu sürümde Premium’u ücretsiz deneyebilirsin; kartından para çekilmez.</p><button class="btn btn-p" type="button" data-act="goPro">Premium’u ücretsiz dene</button></section>')+
+  (isPro()?'<section class="card acts"><p style="margin:0;font-weight:700">Premium ücretsiz denemen açık'+(state.planSince?' ('+trDate(state.planSince)+' tarihinden beri)':'')+'.</p><button class="btn btn-g" type="button" data-act="stmt">Ekstreden abonelik bul</button><button class="btn btn-g" type="button" data-act="toFree">Ücretsiz plana dön</button></section>':'')+priceBox()+
   '</div>';
 }
 function vHome(){
@@ -676,10 +704,20 @@ terms:'<div class="legal"><p class="draft">Taslak metindir; yayından önce huku
 '<h3>Kampanya ve fiyat bilgileri</h3><p>Bilgiler bankaların ve platformların herkese açık sayfalarından derlenir, bilgilendirme amaçlıdır ve teklif değildir. Kampanya koşullarını bankalar belirler ve değiştirebilir; katılmadan önce bankanın kendi sayfasından kontrol etmelisin. Bilgilerin eksiksiz ve güncel olduğunu garanti etmeyiz.</p>'+
 '<h3>Senin sorumluluğun</h3><p>Girdiğin bilgilerin doğruluğundan sen sorumlusun. Kart numarası, şifre ya da başkasına ait kişisel veri girmemelisin.</p>'+
 '<h3>Markalar</h3><p>Adı geçen banka, kart programı ve platform adları sahiplerine aittir ve yalnızca kampanyayı tanımlamak için kullanılır. Abonelik Cüzdanı bu kuruluşların resmi ürünü değildir.</p>'+
-'<h3>Uygulanacak hukuk</h3><p>Bu koşullara Türkiye Cumhuriyeti hukuku uygulanır.</p></div>'};
+'<h3>Uygulanacak hukuk</h3><p>Bu koşullara Türkiye Cumhuriyeti hukuku uygulanır.</p></div>',
+sales:'<div class="legal"><p class="draft">Taslak metindir; ödeme açılmadan önce hukuken kontrol edilecektir.</p>'+
+'<h3>Taraflar</h3><p>Satıcı: AGN Sanayi ve Ticaret Ltd. Şti. · Adres: [eklenecek] · E-posta: [eklenecek] · Vergi no: [eklenecek]. Alıcı: Premium’u satın alan kullanıcı.</p>'+
+'<h3>Konu</h3><p>Abonelik Cüzdanı Premium dijital hizmetinin aylık (₺29,99) veya yıllık (₺249,99) abonelik olarak satışı. Fiyatlara KDV dahildir.</p>'+
+'<h3>Ödeme ve yenileme</h3><p>Ödeme kredi veya banka kartıyla, lisanslı ödeme kuruluşu aracılığıyla alınır; kart bilgileri bizde saklanmaz. Abonelik, iptal edilmedikçe her dönem sonunda aynı tutarla otomatik yenilenir.</p>'+
+'<h3>İfa</h3><p>Hizmet, ödeme onaylandığı anda elektronik ortamda anında sunulur.</p>'+
+'<h3>Cayma hakkı</h3><p>Mesafeli Sözleşmeler Yönetmeliği m.15 uyarınca, elektronik ortamda anında ifa edilen dijital hizmetlerde, alıcının onayıyla ifaya başlandıktan sonra cayma hakkı kullanılamaz.</p>'+
+'<h3>Uyuşmazlık</h3><p>Uyuşmazlıklarda Tüketici Hakem Heyetleri ve Tüketici Mahkemeleri yetkilidir.</p></div>',
+refund:'<div class="legal"><p class="draft">Taslak metindir; ödeme açılmadan önce hukuken kontrol edilecektir.</p>'+
+'<h3>İptal</h3><p>Aboneliğini Profil’den istediğin zaman iptal edebilirsin. İptal ettiğinde ödediğin dönemin sonuna kadar Premium açık kalır, sonraki dönem için ücret alınmaz.</p>'+
+'<h3>İade</h3><p>Başlamış bir dönemin ücreti kural olarak iade edilmez. Hatalı veya mükerrer çekimlerde [e-posta eklenecek] adresine yazarsan inceleyip 14 gün içinde kartına iade ederiz.</p></div>'};
 function legalSheet(k){
   const root=document.getElementById("sheetRoot");
-  root.innerHTML='<div class="scrim" data-close><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="lh"><div class="row"><h2 id="lh">'+(k==="kvkk"?"KVKK Aydınlatma Metni":"Kullanım Koşulları")+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+LEGAL[k]+'<button class="btn btn-p" type="button" data-close>Anladım</button></div></div>';
+  root.innerHTML='<div class="scrim" data-close><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="lh"><div class="row"><h2 id="lh">'+({kvkk:"KVKK Aydınlatma Metni",terms:"Kullanım Koşulları",sales:"Mesafeli Satış Sözleşmesi",refund:"İptal ve İade Koşulları"})[k]+'</h2><button class="link" type="button" data-close>Kapat</button></div>'+LEGAL[k]+'<button class="btn btn-p" type="button" data-close>Anladım</button></div></div>';
   root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.matches("[data-close]"))root.innerHTML=""});
 }
 const initials=n=>String(n||"?").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toLocaleUpperCase("tr-TR")||"?";
@@ -847,7 +885,7 @@ function openSheet(id){
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("sheetRoot").innerHTML=""});
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice],[data-sv],[data-calm],[data-day],[data-legal]"); if(!t||t.closest("#sheetRoot"))return;
+  const t=e.target.closest("[data-go],[data-act],[data-edit],[data-filter],[data-card],[data-joined],[data-setprice],[data-sv],[data-calm],[data-day],[data-legal],[data-pick]"); if(!t||t.closest("#sheetRoot"))return;
   if(t.dataset.go){state.view=t.dataset.go;try{history.replaceState(null,"","#"+state.view)}catch(_){}render();window.scrollTo(0,0)}
   else if(t.dataset.edit)openSheet(t.dataset.edit);
   else if(t.dataset.legal)legalSheet(t.dataset.legal);
@@ -862,6 +900,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.act==="export"||t.dataset.act==="import")dataSheet(t.dataset.act);
   else if(t.dataset.act==="logout")logout();
   else if(t.dataset.act==="stmt"){if(isPro())importSheet();else{state.view="premium";render();window.scrollTo(0,0)}}
+  else if(t.dataset.pick){payPick=t.dataset.pick;render()}
+  else if(t.dataset.act==="pay"){const ok=document.getElementById("pay-ok"),er=document.getElementById("pay-err");if(!ok.checked){er.textContent="Devam etmek için sözleşmeyi onayla.";er.hidden=false;return}
+    if(PAY.checkoutUrl){location.href=PAY.checkoutUrl+"?plan="+payPick+"&u="+encodeURIComponent(acc.current||"")}else paySheet()}
   else if(t.dataset.act==="goPro"){state.plan="premium";state.planSince=iso(today);save();render();window.scrollTo(0,0)}
   else if(t.dataset.act==="toFree"){state.plan="free";state.planSince=null;save();render()}
   else if(t.dataset.act==="toRegister"||t.dataset.act==="toLogin"){authMode=t.dataset.act==="toRegister"?"register":"login";acc.current=null;saveAcc();render()}
