@@ -202,6 +202,22 @@ body.locked .shell,body.locked .tabbar{display:none!important}
 .cal .more{font-size:10px;color:var(--muted);font-weight:700}
 .legal h3{font-size:15px;margin:14px 0 4px}.legal p,.legal li{font-size:13.5px;line-height:1.55;margin:4px 0}.legal ul{padding-left:18px;margin:4px 0}
 .legal .draft{background:var(--accent-soft);border-radius:10px;padding:8px 10px;font-size:12.5px}
+.lock{display:flex;flex-direction:column;gap:10px;border:1px dashed var(--accent);background:linear-gradient(135deg,var(--accent-soft),var(--surface))}
+.lock .row h2{display:flex;align-items:center;gap:8px}
+.badge-pro{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:var(--accent);color:var(--accent-fg);vertical-align:middle}
+.badge-soon{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.pro-hero{border-radius:22px;padding:24px 20px;background:linear-gradient(140deg,#5B4FE8,#8A3FD1);color:#fff;display:flex;flex-direction:column;gap:8px}
+.pro-hero small{opacity:.85;font-weight:600}.pro-hero .big{font-family:var(--display);font-size:30px;font-weight:800;line-height:1.15;letter-spacing:-.02em}
+.pro-hero p{margin:0;opacity:.9;font-size:14px}
+.cmp{width:100%;border-collapse:collapse;font-size:14px}
+.cmp th,.cmp td{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.cmp th{font-size:12px;color:var(--muted);font-weight:700}
+.cmp td.c{text-align:center;width:70px;font-weight:800}
+.cmp .y{color:var(--good)}.cmp .n{color:var(--muted);font-weight:600}
+.imp-row{display:grid;grid-template-columns:auto 36px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.imp-row input{width:18px;height:18px;accent-color:var(--accent)}
+.imp-row .trunc{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
 @media (prefers-reduced-motion:no-preference){.view{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
 </style>
 
@@ -265,12 +281,12 @@ const me=()=>acc.current&&!isGuest()?acc.users[acc.current]:null;
 const dataKey=u=>(u===undefined?acc.current:u)&&(u===undefined?acc.current:u)!==GUEST?KEY+":"+(u===undefined?acc.current:u):KEY;
 let state;
 function loadData(){
-state={subs:isGuest()||!acc.current?sample():[],isSample:isGuest()||!acc.current,view:state&&state.view||"home",q:"",filter:"Tümü",statMode:"cat",myCards:isGuest()?["Bonus","Maximum"]:[],young:isGuest(),joined:{},saved:{}};
-try{const raw=localStorage.getItem(dataKey());if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;}}catch(e){}
+state={subs:isGuest()||!acc.current?sample():[],isSample:isGuest()||!acc.current,view:state&&state.view||"home",q:"",filter:"Tümü",statMode:"cat",myCards:isGuest()?["Bonus","Maximum"]:[],young:isGuest(),joined:{},saved:{},plan:"free",planSince:null};
+try{const raw=localStorage.getItem(dataKey());if(raw){const p=JSON.parse(raw);if(Array.isArray(p.subs)){state.subs=p.subs;state.isSample=!!p.isSample}if(!p.isSample){state.myCards=[];state.young=false}if(Array.isArray(p.myCards))state.myCards=p.myCards;if(typeof p.young==="boolean")state.young=p.young;if(p.joined&&typeof p.joined==="object")state.joined=p.joined;if(p.saved&&typeof p.saved==="object")state.saved=p.saved;if(p.plan==="premium"){state.plan="premium";state.planSince=p.planSince||null}}}catch(e){}
 }
 loadData();
-function save(){try{localStorage.setItem(dataKey(),JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved}))}catch(e){}}
-try{const h=location.hash.slice(1);if(VIEWS.some(v=>v[0]===h))state.view=h}catch(e){}
+function save(){try{localStorage.setItem(dataKey(),JSON.stringify({subs:state.subs,isSample:state.isSample,myCards:state.myCards,young:state.young,joined:state.joined,saved:state.saved,plan:state.plan,planSince:state.planSince}))}catch(e){}}
+try{const h=location.hash.slice(1);if(VIEWS.some(v=>v[0]===h)||h==="premium")state.view=h}catch(e){}
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const tl=n=>new Intl.NumberFormat("tr-TR",{maximumFractionDigits:n%1?2:0}).format(n);
@@ -435,6 +451,77 @@ function feedNote(){
   if(feedState==="error")return '<div class="note">Kampanya listesi şu an yüklenemedi. Sayfayı yenilemeyi dene.</div>';
   return '';
 }
+const FREE_LIMIT=5;
+const isPro=()=>state.plan==="premium";
+function lockCard(title,text){return '<section class="card lock"><div class="row"><h2>'+title+' <span class="badge-pro">PREMIUM</span></h2></div><p class="sub" style="margin:0;font-size:14px">'+text+'</p><button class="btn btn-p" type="button" data-go="premium">Premium’u incele</button></section>'}
+const MERCH=[["netflix","Netflix","Eğlence"],["spotify","Spotify","Müzik"],["youtube","YouTube Premium","Eğlence"],["disneyplus","Disney+","Eğlence"],["disney+","Disney+","Eğlence"],["disney","Disney+","Eğlence"],["primevideo","Amazon Prime","Eğlence"],["amazonprime","Amazon Prime","Eğlence"],["exxen","Exxen","Eğlence"],["blutv","BluTV","Eğlence"],["hbomax","HBO Max","Eğlence"],["max.com","HBO Max","Eğlence"],["tabii","tabii","Eğlence"],["mubi","MUBI","Eğlence"],["ssport","S Sport Plus","Eğlence"],["beinconnect","beIN CONNECT","Eğlence"],["todtv","TOD","Eğlence"],["digiturk","Digiturk","Eğlence"],["applemusic","Apple Music","Müzik"],["deezer","Deezer","Müzik"],["fizy","fizy","Müzik"],["storytel","Storytel","Diğer"],["audible","Audible","Diğer"],["icloud","iCloud+","Bulut"],["apple.com/bill","Apple (App Store/iCloud)","Bulut"],["googleone","Google One","Bulut"],["openai","ChatGPT Plus","Verimlilik"],["chatgpt","ChatGPT Plus","Verimlilik"],["anthropic","Claude","Verimlilik"],["claude.ai","Claude","Verimlilik"],["geminiadvanced","Gemini","Verimlilik"],["adobe","Adobe Creative Cloud","Verimlilik"],["canva","Canva","Verimlilik"],["microsoft365","Microsoft 365","Verimlilik"],["notion","Notion","Verimlilik"],["duolingo","Duolingo","Diğer"],["xboxgamepass","Xbox Game Pass","Oyun"],["xbox","Xbox Game Pass","Oyun"],["playstationplus","PlayStation Plus","Oyun"],["psplus","PlayStation Plus","Oyun"],["playstation","PlayStation Plus","Oyun"],["eaplay","EA Play","Oyun"],["macfit","MACFit","Diğer"],["turkcell","Turkcell","Diğer"],["vodafone","Vodafone","Diğer"],["turktelekom","Türk Telekom","Diğer"],["superonline","Superonline","Diğer"]];
+function parseStatement(text){
+  const found={};
+  text.split(/\r?\n/).forEach(line=>{
+    const flat=line.toLowerCase().replace(/\u0131/g,"i").replace(/\u0307/g,"").replace(/[\s*_\-]/g,"");
+    const m=MERCH.find(x=>flat.includes(x[0]));if(!m)return;
+    const am=[...line.matchAll(/(?<![\d.,])(\d{1,3}(?:\.\d{3})*|\d+),(\d{2})(?![\d])/g)];if(!am.length)return;
+    const a=am[am.length-1],price=parseFloat(a[1].replace(/\./g,"")+"."+a[2]);if(!(price>0&&price<100000))return;
+    const dm=/(\d{1,2})[./](\d{1,2})[./](\d{2,4})/.exec(line);let date=null;
+    if(dm){const y=+dm[3]<100?2000+ +dm[3]:+dm[3];const d=new Date(y,+dm[2]-1,+dm[1]);if(!isNaN(d)&&d.getDate()===+dm[1])date=d}
+    const k=m[1],cur=found[k];
+    if(!cur||(date&&(!cur.date||date>cur.date)))found[k]={name:m[1],cat:m[2],price,date,line:line.trim().slice(0,90)};
+  });
+  return Object.values(found);
+}
+let pdfLib=null;
+function loadPdf(){if(pdfLib)return pdfLib;pdfLib=new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";ok(window.pdfjsLib)}catch(e){no(e)}};sc.onerror=()=>{pdfLib=null;no(new Error("pdf"))};document.head.appendChild(sc)});return pdfLib}
+async function pdfText(buf){
+  const lib=await loadPdf(),doc=await lib.getDocument({data:buf}).promise;let out=[];
+  for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i),tc=await pg.getTextContent(),rows={};
+    const its=tc.items.filter(t=>t.str.trim()).sort((a,b)=>b.transform[5]-a.transform[5]);let cur=[],cy=null;
+    const flush=()=>{if(cur.length)out.push(cur.sort((a,b)=>a.transform[4]-b.transform[4]).map(t=>t.str).join(" "));cur=[]};
+    its.forEach(t=>{const y=t.transform[5];if(cy===null||Math.abs(y-cy)>3){flush();cy=y}cur.push(t)});flush()}
+  return out.join("\n");
+}
+function importSheet(){
+  const root=document.getElementById("sheetRoot");
+  root.innerHTML='<div class="scrim" data-close><form class="sheet" id="imf" role="dialog" aria-modal="true" aria-labelledby="imh">'+
+  '<div class="row"><h2 id="imh">Ekstreden abonelik bul</h2><button class="link" type="button" data-close>Kapat</button></div>'+
+  '<p class="sub" style="font-size:13px;margin:0">Kredi kartı ekstreni PDF olarak seç ya da ekstre satırlarını yapıştır. Dosya telefonunda okunur, hiçbir yere gönderilmez.</p>'+
+  '<label class="drop"><b>PDF ekstre seç</b><span class="mt">Bankanın internet şubesinden ya da mobil uygulamasından indirdiğin ekstre</span><input id="im-file" type="file" accept="application/pdf,.pdf,.txt,.csv"></label>'+
+  '<div class="field"><label for="im-text">ya da ekstre metnini yapıştır</label><textarea id="im-text" style="min-height:90px" placeholder="12.11.2026 NETFLIX.COM 229,99"></textarea></div>'+
+  '<p class="err" id="im-err" role="alert" hidden></p><div id="im-res"></div>'+
+  '<button class="btn btn-p" type="submit" id="im-go">Abonelikleri bul</button></form></div>';
+  root.querySelector(".scrim").addEventListener("click",e=>{if(e.target.matches("[data-close]"))root.innerHTML=""});
+  const err=document.getElementById("im-err"),res=document.getElementById("im-res"),go=document.getElementById("im-go");let hits=null;
+  const show=list=>{const have=new Set(state.subs.map(x=>x.name.toLocaleLowerCase("tr-TR")));
+    hits=list.map(h=>Object.assign(h,{dup:have.has(h.name.toLocaleLowerCase("tr-TR"))}));
+    if(!hits.length){err.textContent="Bu ekstrede tanıdığımız bir abonelik bulamadık. Aboneliği elle ekleyebilirsin.";err.hidden=false;res.innerHTML="";go.textContent="Abonelikleri bul";hits=null;return}
+    err.hidden=true;
+    res.innerHTML='<p style="margin:0 0 4px;font-weight:700">'+hits.length+' abonelik bulundu</p>'+hits.map((h,i)=>'<label class="imp-row"><input type="checkbox" data-i="'+i+'"'+(h.dup?'':' checked')+'>'+badge(h.name,true)+'<span style="min-width:0"><b>'+esc(h.name)+'</b><br><span class="mt">'+(h.date?h.date.toLocaleDateString("tr-TR",{day:"numeric",month:"long"}):'')+(h.dup?' · listende zaten var':'')+'</span><span class="mt trunc">'+esc(h.line)+'</span></span><b class="num">₺'+tl2(h.price)+'</b></label>').join("")+
+    '<p class="mt" style="margin:8px 0 0">Aylık abonelik olarak eklenir; ödeme günü ekstredeki tarihten alınır. Eklemeden sonra düzenleyebilirsin.</p>';
+    go.textContent="Seçilenleri ekle"};
+  document.getElementById("im-file").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;err.hidden=true;res.innerHTML='<p class="mt">Ekstre okunuyor…</p>';
+    try{const txt=/\.pdf$/i.test(f.name)||f.type==="application/pdf"?await pdfText(await f.arrayBuffer()):await f.text();show(parseStatement(txt))}
+    catch(_){res.innerHTML="";err.textContent="Dosya okunamadı. Şifreli PDF ise şifresiz indirip tekrar dene ya da satırları yapıştır.";err.hidden=false}});
+  document.getElementById("imf").addEventListener("submit",e=>{e.preventDefault();
+    if(!hits){const t=document.getElementById("im-text").value;if(!t.trim()){err.textContent="Bir PDF seç ya da ekstre satırlarını yapıştır.";err.hidden=false;return}show(parseStatement(t));return}
+    const pick=[...res.querySelectorAll("input[data-i]:checked")].map(x=>hits[+x.dataset.i]);if(!pick.length){err.textContent="Eklemek için en az bir abonelik seç.";err.hidden=false;return}
+    pick.forEach((h,i)=>{const d=h.date||new Date(today);state.subs.push({id:"u"+Date.now()+i,name:h.name,price:h.price,cycle:"m",next:iso(d),cat:CATS.includes(h.cat)?h.cat:"Diğer",card:CARDS[0],trial:false})});
+    save();root.innerHTML="";state.view="subs";render();
+  });
+}
+function vPremium(){
+  const pot=potential(),sy=savedYear(),sp=savedPending(),total=totalMonthly();
+  const head=sy>0?'Premium kendini ödüyor: bu yıl ₺'+tl(sy)+' tasarruf ettin':pot.sum>0?'Premium kendini ödüyor: bu dönem ₺'+tl(pot.sum)+' geri alabilirsin':'Premium kendini ödüyor';
+  const sub=sy>0?(sp>0?'Onay bekleyen ₺'+tl(sp)+' daha var. ':'')+'Doğru kartla ödeyerek kazandıklarını Premium takip eder.':pot.sum>0?pot.n+' aboneliğinde kampanya var. Hangi kartla ödeyeceğini Premium söyler.':'Aylık ₺'+tl(Math.round(total))+' abonelik giderin için kampanya, zam ve deneme süresi uyarıları.';
+  const Y='<td class="c y">✓</td>',N='<td class="c n">–</td>',soon=' <span class="badge-soon">Yakında</span>';
+  const rows=[["Abonelik sayısı",'<td class="c">5</td>','<td class="c y">Sınırsız</td>'],["Takvim ve ödeme günleri",Y,Y],["Temel hatırlatma",Y,Y],
+   ["Kişiye özel banka kampanya önerileri",N,Y],["Kampanya bitiş uyarısı"+soon,N,Y],["Tasarruf sayacı ve yıllık rapor",N,Y],["Analiz ekranı",N,Y],["Fiyat artışı (zam) uyarısı",N,Y],["Deneme süresi bitiş uyarısı",N,Y],
+   ["Kredi kartı ekstresinden abonelik okuma",N,Y],["Aile / ortak abonelik paylaşımı"+soon,N,Y],["Bulut yedekleme ve cihazlar arası senkron"+soon,N,Y]];
+  return '<div class="view"><div class="row"><h1>Premium</h1><button class="link" type="button" data-go="profile">‹ Profil</button></div>'+
+  '<section class="pro-hero"><small>'+(isPro()?'Premium açık':'Ücretsiz plandasın')+'</small><div class="big">'+head+'</div><p>'+sub+'</p></section>'+
+  '<section class="card"><table class="cmp"><thead><tr><th>Özellik</th><th style="text-align:center">Ücretsiz</th><th style="text-align:center">Premium</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td>'+r[1]+r[2]+'</tr>').join("")+'</tbody></table></section>'+
+  (isPro()?'<section class="card acts"><p style="margin:0;font-weight:700">Premium deneme sürümün açık'+(state.planSince?' ('+trDate(state.planSince)+' tarihinden beri)':'')+'.</p><button class="btn btn-g" type="button" data-act="stmt">Ekstreden abonelik bul</button><button class="btn btn-g" type="button" data-act="toFree">Ücretsiz plana dön</button></section>':
+   '<section class="card acts"><p style="margin:0;font-weight:700">Fiyat yakında açıklanacak.</p><p class="sub" style="margin:0;font-size:13px">Ödeme altyapısı henüz kurulmadı. Bu sürümde Premium’u ücretsiz deneyebilirsin; kartından para çekilmez.</p><button class="btn btn-p" type="button" data-act="goPro">Premium’u ücretsiz dene</button></section>')+
+  '</div>';
+}
 function vHome(){
   const subs=[...state.subs].sort((a,b)=>daysLeft(a)-daysLeft(b));
   const week=subs.filter(s=>daysLeft(s)<=7), trials=subs.filter(s=>s.trial);
@@ -447,11 +534,11 @@ function vHome(){
   (state.subs.length?
   '<section class="hero"><div><small>Aylık toplam abonelik giderin</small><div class="big num">'+tl(Math.round(totalMonthly()))+' <span>TL</span></div>'+
   '<div class="meta"><span>Yıllık <b class="num">'+tl(Math.round(totalMonthly()*12))+' TL</b></span><span>Bu ay kalan ödemeler <b class="num">'+tl(thisMonth)+' TL</b></span><span><b>'+state.subs.length+'</b> abonelik</span></div></div>'+
-  (pot.sum>0?'<div class="gain"><small>Bu dönem doğru kartla geri alabileceğin (tahmini)</small><b class="num">'+tl(pot.sum)+' TL</b><button class="link" style="color:#fff;text-decoration:underline" type="button" data-go="subs">'+pot.n+' abonelikte fırsat var</button></div>':mc>0?'<div class="gain"><small>Aboneliklerine uyan güncel kampanya</small><b class="num">'+mc+' kampanya</b><button class="link" style="color:#fff;text-decoration:underline" type="button" data-go="offers">Kampanyaları gör</button></div>':'')+'</section>'+
+  (pot.sum>0?'<div class="gain"><small>Bu dönem doğru kartla geri alabileceğin (tahmini)</small><b class="num">'+tl(pot.sum)+' TL</b><button class="link" style="color:#fff;text-decoration:underline" type="button" data-go="'+(isPro()?'subs':'premium')+'">'+pot.n+' abonelikte fırsat var</button></div>':mc>0?'<div class="gain"><small>Aboneliklerine uyan güncel kampanya</small><b class="num">'+mc+' kampanya</b><button class="link" style="color:#fff;text-decoration:underline" type="button" data-go="offers">Kampanyaları gör</button></div>':'')+'</section>'+
   '<div class="tiles">'+
    '<button class="tile" type="button" data-go="subs"><span class="ic" style="background:var(--accent-soft);color:var(--accent)">'+ICONS.cal.replace('<svg','<svg width="18" height="18"')+'</span><span class="lbl">7 gün içinde ödenecek</span><span class="val">'+week.length+' abonelik</span></button>'+
-   '<button class="tile" type="button" data-go="subs"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">'+ICONS.warn.replace('<svg','<svg width="18" height="18"')+'</span><span class="lbl">Deneme süresi bitecek</span><span class="val" style="color:var(--bad)">'+trials.length+' abonelik</span></button>'+
-  '</div>':emptyState())+todoBlock()+priceBlock()+
+   '<button class="tile" type="button" data-go="'+(isPro()?'subs':'premium')+'"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">'+ICONS.warn.replace('<svg','<svg width="18" height="18"')+'</span><span class="lbl">Deneme süresi bitecek</span><span class="val" style="color:var(--bad)">'+(isPro()?trials.length+' abonelik':'🔒 Premium')+'</span></button>'+
+  '</div>':emptyState())+(isPro()?todoBlock()+priceBlock():(state.subs.length&&pot.sum>0?lockCard('Bu ay kaçırma','Bu ay '+pot.n+' aboneliğinde doğru kartla yaklaşık ₺'+tl(pot.sum)+' geri alabilirsin. Hangi kartla ödeyeceğini ve kampanyaya nasıl katılacağını Premium adım adım söyler.'):'')+(state.subs.map(priceAlert).some(Boolean)?lockCard('Zam radarı','Aboneliklerinden en az birine zam geldi. Yeni fiyatı ve yıllık etkisini Premium ile gör.'):''))+
   '<section class="view" style="gap:12px"><div class="row"><h2>Kampanya haberleri</h2><button class="link" type="button" data-go="offers">Tümü</button></div>'+
   (FEED.updatedAt?'<p class="sub" style="font-size:13px">Banka kampanya sayfalarından derlendi · son güncelleme '+trDate(FEED.updatedAt)+'</p>':'')+
   feedNote()+news.map(c=>newsCard(c,true)).join("")+'</section>'+
@@ -462,13 +549,13 @@ function vHome(){
 function vSubs(){
   const q=state.q.toLocaleLowerCase("tr-TR");
   let subs=state.subs.filter(s=>(state.filter==="Tümü"||s.cat===state.filter)&&s.name.toLocaleLowerCase("tr-TR").includes(q)).sort((a,b)=>daysLeft(a)-daysLeft(b));
-  return '<div class="view">'+sampleBanner()+'<div class="row"><h1>Abonelikler</h1><button class="btn btn-p" type="button" data-act="add">+ Ekle</button></div>'+
+  return '<div class="view">'+sampleBanner()+'<div class="row"><h1>Abonelikler</h1><span style="display:flex;gap:8px"><button class="btn btn-g" type="button" data-act="stmt">Ekstreden bul</button><button class="btn btn-p" type="button" data-act="add">+ Ekle</button></span></div>'+
   '<div class="toolbar"><label class="search">'+ICONS.search+'<input id="q" type="search" placeholder="Abonelik ara…" value="'+esc(state.q)+'" aria-label="Abonelik ara"></label></div>'+
   '<div class="seg" role="group" aria-label="Kategori">'+["Tümü"].concat(CATS).map(c=>'<button type="button" data-filter="'+c+'" aria-pressed="'+(state.filter===c)+'">'+c+'</button>').join("")+'</div>'+
-  (state.subs.length?'<section class="card"><div class="list">'+(subs.length?subs.map(s=>{const r=recFor(s);
+  (state.subs.length?'<section class="card"><div class="list">'+(subs.length?subs.map(s=>{const r=isPro()?recFor(s):{};
     const ex=r.best?'<br><span class="mt" style="color:var(--good)">'+(s.card===r.best.program?'✓ Doğru kartla ödüyorsun · ':'Bu ay '+esc(r.best.program)+' ile öde · ')+esc(r.best.title)+(gainOf(s,r.best)?' · yaklaşık '+tl(gainOf(s,r.best))+' TL kazanç':'')+'</span>':
       (r.other?'<br><span class="mt">'+esc(r.other.program)+' kartın olsaydı: '+esc(r.other.title)+'</span>':'');
-    const pa=priceAlert(s),zx=pa?'<br><span class="mt" style="color:var(--warn)">'+(pa.kind==="zam"?'Zam geldi: yeni fiyat '+tl(pa.p.price)+' TL':'Fiyat güncel olmayabilir')+'</span>':'';
+    const pa=isPro()&&priceAlert(s),zx=pa?'<br><span class="mt" style="color:var(--warn)">'+(pa.kind==="zam"?'Zam geldi: yeni fiyat '+tl(pa.p.price)+' TL':'Fiyat güncel olmayabilir')+'</span>':'';
     return itemRow(s,zx+ex)}).join(""):'<p class="empty">Bu aramaya uyan abonelik yok.</p>')+'</div></section>':emptyState())+'</div>';
 }
 function vOffers(){
@@ -489,6 +576,7 @@ function donut(parts,total){
   '<text x="100" y="98" text-anchor="middle" fill="var(--fg)" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22">'+tl(Math.round(total))+' TL</text><text x="100" y="120" text-anchor="middle" fill="var(--muted)" font-size="12">aylık toplam</text></svg>';
 }
 function vStats(){
+  if(!isPro())return '<div class="view"><h1>Analiz</h1>'+lockCard('Analiz ve tasarruf sayacı','Kategori dağılımı, en pahalı aboneliklerin, yıllık raporun ve kampanyalarla bu yıl ne kadar kazandığın Premium’da.')+'</div>';
   if(!state.subs.length)return '<div class="view"><h1>Analiz</h1>'+emptyState()+'</div>';
   const total=totalMonthly();
   const parts=CATS.map(k=>({k,v:state.subs.filter(s=>s.cat===k).reduce((a,s)=>a+monthly(s),0)})).filter(p=>p.v>0).sort((a,b)=>b.v-a.v);
@@ -601,13 +689,14 @@ function vProfile(){
    '<div class="prof"><span class="avatar" aria-hidden="true">?</span><div><h2 style="margin:0">Misafir</h2><p class="sub" style="margin:2px 0 0">Hesap açmadan kullanıyorsun.</p></div></div><button class="btn btn-p" type="button" data-act="toRegister">Hesap oluştur</button><p class="mt" style="margin:0">Hesap açarsan bu cihazdaki aboneliklerin hesabına taşınır.</p>';
   return '<div class="view"><div><h1>Profil</h1><p class="sub">Hesabın, kartların ve verilerin.</p></div>'+
   '<section class="card" style="display:flex;flex-direction:column;gap:12px">'+head+'</section>'+
+  '<section class="card row"><span><b>Planın: '+(isPro()?'Premium (deneme)':'Ücretsiz')+'</b><br><span class="mt">'+(isPro()?'Tüm özellikler açık.':state.subs.length+' / '+FREE_LIMIT+' abonelik kullanılıyor')+'</span></span><button class="btn '+(isPro()?'btn-g':'btn-p')+'" type="button" data-go="premium">'+(isPro()?'Planı gör':'Premium’a geç')+'</button></section>'+
   '<section class="card"><h2>Özetin</h2><div class="tiles" style="margin-top:12px">'+
    '<div class="tile"><span class="lbl">Abonelik</span><span class="val num">'+state.subs.length+'</span></div>'+
    '<div class="tile"><span class="lbl">Aylık toplam</span><span class="val num">'+tl(Math.round(total))+' TL</span></div>'+
    '<div class="tile"><span class="lbl">Bu yıl kazandığın</span><span class="val num" style="color:var(--good)">'+tl(savedYear())+' TL</span></div>'+
   '</div></section>'+
   '<section class="card"><div class="row"><h2>Kartlarım</h2><button class="link" type="button" data-go="offers">Düzenle</button></div><p class="sub" style="font-size:14px;margin:8px 0 0">'+(cards.length?esc(cards.join(", ")):"Henüz kart seçmedin.")+(state.young?' · 18–26 yaş kampanyaları açık':'')+'</p></section>'+
-  '<section class="card acts"><h2>Daha fazla</h2><button class="btn btn-g" type="button" data-go="stats">Analiz ve tasarruf sayacı</button><button class="btn btn-g" type="button" data-legal="kvkk">KVKK Aydınlatma Metni</button><button class="btn btn-g" type="button" data-legal="terms">Kullanım Koşulları</button></section>'+
+  '<section class="card acts"><h2>Daha fazla</h2><button class="btn btn-g" type="button" data-act="stmt">Ekstreden abonelik bul'+(isPro()?'':' 🔒')+'</button><button class="btn btn-g" type="button" data-go="stats">Analiz ve tasarruf sayacı'+(isPro()?'':' 🔒')+'</button><button class="btn btn-g" type="button" data-legal="kvkk">KVKK Aydınlatma Metni</button><button class="btn btn-g" type="button" data-legal="terms">Kullanım Koşulları</button></section>'+
   dataCard()+
   (u?'<section class="card acts"><h2>Hesap</h2><button class="btn btn-g" type="button" data-act="editName">Adını değiştir</button><button class="btn btn-g" type="button" data-act="changePw">Parolayı değiştir</button><button class="btn btn-g" type="button" data-act="logout">Çıkış yap</button><div id="delAcc"><button class="btn btn-d" type="button" data-act="delAcc" style="width:100%;text-align:left">Hesabı sil</button></div></section>':
    '<section class="card acts"><h2>Hesap</h2><button class="btn btn-g" type="button" data-act="toLogin">Giriş yap</button></section>')+
@@ -704,7 +793,7 @@ function render(){
   tb.splice(2,0,'<button class="fab" type="button" data-act="add" aria-label="Abonelik ekle">'+ICONS.plus+'</button>');
   document.getElementById("tabbar").innerHTML=tb.join("");
   const m=document.getElementById("main");
-  m.innerHTML=({home:vHome,subs:vSubs,cal:vCal,offers:vOffers,stats:vStats,profile:vProfile})[state.view]();
+  m.innerHTML=({home:vHome,subs:vSubs,cal:vCal,offers:vOffers,stats:vStats,profile:vProfile,premium:vPremium})[state.view]();
   const q=document.getElementById("q");
   if(q)q.addEventListener("input",e=>{state.q=e.target.value;const pos=e.target.selectionStart;render();const n=document.getElementById("q");n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}});
 }
@@ -745,6 +834,7 @@ function openSheet(id){
     const err=document.getElementById("f-err");
     if(!name||!(price>=0)||!next){err.textContent="Ad, ücret ve sonraki ödeme tarihini doldur.";err.hidden=false;return}
     const rec={id:s?s.id:"u"+Date.now(),name,price,cycle:document.getElementById("f-cycle").value,next,cat:document.getElementById("f-cat").value,card:document.getElementById("f-card").value,trial:document.getElementById("f-trial").checked};
+    if(!s&&!isPro()&&state.subs.filter(x=>!state.isSample).length>=FREE_LIMIT){err.innerHTML='Ücretsiz planda en fazla '+FREE_LIMIT+' abonelik ekleyebilirsin. <button class="link" type="button" id="toPro">Premium’u incele</button>';err.hidden=false;document.getElementById("toPro").onclick=()=>{root.innerHTML="";state.view="premium";render();window.scrollTo(0,0)};return}
     if(s)state.subs=state.subs.map(x=>x.id===s.id?rec:x);else state.subs.push(rec);
     save();root.innerHTML="";render();
   });
@@ -771,6 +861,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.act==="add")openSheet(null);
   else if(t.dataset.act==="export"||t.dataset.act==="import")dataSheet(t.dataset.act);
   else if(t.dataset.act==="logout")logout();
+  else if(t.dataset.act==="stmt"){if(isPro())importSheet();else{state.view="premium";render();window.scrollTo(0,0)}}
+  else if(t.dataset.act==="goPro"){state.plan="premium";state.planSince=iso(today);save();render();window.scrollTo(0,0)}
+  else if(t.dataset.act==="toFree"){state.plan="free";state.planSince=null;save();render()}
   else if(t.dataset.act==="toRegister"||t.dataset.act==="toLogin"){authMode=t.dataset.act==="toRegister"?"register":"login";acc.current=null;saveAcc();render()}
   else if(t.dataset.act==="editName")accSheet("name");
   else if(t.dataset.act==="changePw")accSheet("pw");
