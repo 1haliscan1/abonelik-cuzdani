@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-22",
+  "updatedAt": "2026-11-23",
   "sources": [
     {
       "program": "Bonus",
@@ -47,7 +47,7 @@
       "program": "ON",
       "bank": "ON Dijital Bankacılık",
       "url": "https://www.on.com.tr/kampanyalar",
-      "status": "ok"
+      "status": "sayfa okunamadı (23 Kasım)"
     },
     {
       "program": "Papara",
@@ -329,23 +329,6 @@
       "join": "ON Dijital uygulaması > Avantajlar Dünyası'ndan kodu al, epintower.com'da ya da ödeme ekranında kullan",
       "url": "https://on.com.tr/kampanyalar/tod-tv-kampanyasi",
       "detailChecked": true
-    },
-    {
-      "id": "world-troy-pazarama",
-      "program": "World",
-      "bank": "Yapı Kredi",
-      "title": "TROY kartla Pazarama'da 250 TL indirim, 3.000 TL üzerine yıllık Pazarama Plus",
-      "cat": "Diğer",
-      "keywords": [
-        "pazarama"
-      ],
-      "reward": "Tek seferde 1.250 TL ve üzeri alışverişe 250 TL indirim; 3.000 TL ve üzerine yıllık Pazarama Plus üyeliği",
-      "cap": 250,
-      "end": "2026-11-22",
-      "audience": "World TROY kart sahipleri",
-      "join": "Detaylar kampanya sayfasında",
-      "url": "https://www.worldcard.com.tr/kampanyalar/troy-kartla-pazaramada-tek-seferde-1250-tl-ve-uzeri-alisverise-250-tl-indirim",
-      "detailChecked": false
     },
     {
       "id": "maximum-troy-pazarama-plus",
@@ -720,7 +703,7 @@
     }
   ],
   "prices": {
-    "checked": "2026-11-22",
+    "checked": "2026-11-23",
     "services": [
       {
         "id": "netflix",
