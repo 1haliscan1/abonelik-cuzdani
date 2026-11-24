@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-24",
   "sources": [
     {
       "program": "Bonus",
@@ -47,7 +47,7 @@
       "program": "ON",
       "bank": "ON Dijital Bankacılık",
       "url": "https://www.on.com.tr/kampanyalar",
-      "status": "sayfa okunamadı (23 Kasım)"
+      "status": "sayfa okunamadı (23–24 Kasım)"
     },
     {
       "program": "Papara",
@@ -329,23 +329,6 @@
       "join": "ON Dijital uygulaması > Avantajlar Dünyası'ndan kodu al, epintower.com'da ya da ödeme ekranında kullan",
       "url": "https://on.com.tr/kampanyalar/tod-tv-kampanyasi",
       "detailChecked": true
-    },
-    {
-      "id": "maximum-troy-pazarama-plus",
-      "program": "Maximum",
-      "bank": "İş Bankası",
-      "title": "TROY kartla Pazarama'da 3.000 TL üzeri siparişe yıllık Pazarama Plus hediye",
-      "cat": "Diğer",
-      "keywords": [
-        "pazarama"
-      ],
-      "reward": "3.000 TL ve üzeri siparişe yıllık Pazarama Plus üyeliği",
-      "cap": null,
-      "end": "2026-11-23",
-      "audience": "İş Bankası TROY kart sahipleri",
-      "join": "Detaylar kampanya sayfasında",
-      "url": "https://www.maximum.com.tr/kampanyalar",
-      "detailChecked": false
     },
     {
       "id": "bankkart-google-play-2610",
@@ -703,7 +686,7 @@
     }
   ],
   "prices": {
-    "checked": "2026-11-23",
+    "checked": "2026-11-24",
     "services": [
       {
         "id": "netflix",
