@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-24",
+  "updatedAt": "2026-11-25",
   "sources": [
     {
       "program": "Bonus",
@@ -47,7 +47,7 @@
       "program": "ON",
       "bank": "ON Dijital Bankacılık",
       "url": "https://www.on.com.tr/kampanyalar",
-      "status": "sayfa okunamadı (23–24 Kasım)"
+      "status": "sayfa okunamadı (23–25 Kasım)"
     },
     {
       "program": "Papara",
@@ -686,7 +686,7 @@
     }
   ],
   "prices": {
-    "checked": "2026-11-24",
+    "checked": "2026-11-25",
     "services": [
       {
         "id": "netflix",
